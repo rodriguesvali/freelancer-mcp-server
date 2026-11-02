@@ -308,4 +308,4 @@ Adicionar CI e checklist de release, preservando lockfile e evitando depender de
 - [ ] Smoke MCP com HTTP simulado sem regressões; evidências registradas no PR.
 - [ ] Alterações de comportamento documentadas; revisão humana prevista antes de merge.
 
-Implementado workflow para Node 22 e 24 com ações fixadas por commit. Comandos de instalação e teste passaram localmente em Node 22.23.4 e 24.22.2; auditoria sem vulnerabilidades. A execução do workflow no GitHub e a revisão final dependem da publicação da branch e da conclusão da T09.
+Implementado workflow para Node 22, 24 e 26 com ações fixadas por commit, mantendo Node 22 como mínimo. Instalação limpa e testes passaram localmente em Node 22.23.4, 24.22.2 e 26.13.0; auditoria sem vulnerabilidades. A execução do workflow atualizado no GitHub e a revisão final dependem da publicação da branch e da conclusão da T09.

@@ -4,7 +4,7 @@
 
 ## Before publishing
 
-- Confirm CI passes for Node.js 22 and 24, including the lockfile audit. Triage any high or critical advisories before release.
+- Confirm CI passes for Node.js 22, 24 and 26, including the lockfile audit. Triage any high or critical advisories before release.
 - Finish the outstanding response-contract checks and have the changes reviewed.
 - Document the new Node.js 22 minimum and the multi-account write requirement as compatibility changes. Choose the release version accordingly.
 - Check the package and registry versions listed below are consistent.
