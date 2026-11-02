@@ -135,6 +135,8 @@ The first account listed becomes the default for reads. When multiple accounts a
 
 ### Running from source (contributing)
 
+Node.js 22 or newer is required. This raises the previous minimum of Node.js 18; upgrade Node before updating this server.
+
 ```bash
 git clone https://github.com/godesigntech/freelancer-mcp-server.git
 cd freelancer-mcp-server
@@ -143,9 +145,11 @@ npm run build
 claude mcp add freelancer --env FREELANCER_OAUTH_TOKEN=your_token_here -- node /FULL/PATH/TO/freelancer-mcp-server/dist/index.js
 ```
 
+For local development, set `FREELANCER_OAUTH_TOKEN` or `FREELANCER_ACCOUNTS` in your environment and run `npm run dev`. The command compiles the project before starting the stdio server; invoke `npm run --silent dev` when connecting it as an MCP client so npm does not write lifecycle banners to stdout. Environment variables must be provided by your shell or MCP client; `.env` files are not loaded automatically.
+
 ## Testing
 
-Ask Claude:
+Run the automated suite with `npm test`; its API requests use simulated HTTP and do not require credentials. To manually check a real account, ask Claude:
 > "Show my Freelancer profile"
 
 If it responds with your username and stats, you're set.
@@ -176,7 +180,7 @@ The server applies local limits independently of Freelancer API limits: up to 10
 
 ## Security notes
 
-- Tokens live only in your local MCP client config (or `.env` for `npm run dev`) — never committed, never sent anywhere but Freelancer's own API.
+- Tokens live in your local MCP client config or process environment — never committed, never sent anywhere but Freelancer's own API.
 - The server runs entirely on your machine; no telemetry, no third-party calls.
 - Write operations are enabled by default for compatibility. Set `FREELANCER_READ_ONLY=true` in the MCP environment to block messages, bids and profile/skill changes; set it to `false` or omit it to enable writes. Invalid values prevent startup. Approval of tool calls depends on your MCP client and its settings; the server does not provide a human confirmation step.
 - This repo contains no data from, and no dependency on, any other project — it's a clean, standalone Freelancer.com integration.
@@ -193,7 +197,7 @@ The server applies local limits independently of Freelancer API limits: up to 10
 → Run `freelancer_list_accounts` to see the exact labels configured, then use one of those.
 
 **Tool not appearing in Claude**
-→ If using `npx`, confirm Node.js 18+ is installed and `npx -y freelancer-mcp-server` runs without error from a terminal. If running from source, confirm the path in your config is the absolute path to `dist/index.js`, and that `npm run build` succeeded.
+→ If using `npx`, confirm Node.js 22+ is installed and `npx -y freelancer-mcp-server` runs without error from a terminal. If running from source, confirm the path in your config is the absolute path to `dist/index.js`, and that `npm run build` succeeded.
 
 ## Contributing
 
