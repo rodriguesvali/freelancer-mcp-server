@@ -220,7 +220,7 @@ Distinguir ausência de skills de uma solicitação explícita de remoção de t
 - [ ] Smoke MCP com HTTP simulado sem regressões; evidências registradas no PR.
 - [ ] Alterações de comportamento documentadas; revisão humana prevista antes de merge.
 
-A documentação acessível não confirmou semântica de lista vazia; rejeição segura implementada e testada. Confirmação oficial ou sandbox segue pendente.
+O schema do aplicativo oficial descreve skill_ids como array, mas não define o efeito de lista vazia. Rejeição segura, testes adicionais e procedimento com perfil descartável estão documentados em docs/api-contracts.md. Nenhum token ou perfil de sandbox estava configurado; a verificação em sandbox segue pendente.
 
 ## T12 [P2]: Concentrar transporte e serialização
 

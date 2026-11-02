@@ -128,7 +128,7 @@ Use when: "Update specialty profile 12345's hourly rate to 40"`,
     },
     async ({ profile_id, tagline, hourly_rate, description, skills, account }) => {
       try {
-        if (skills && skills.length === 0) return mcpError("Empty skills are not supported; omit skills to leave them unchanged.");
+        if (skills && skills.length === 0) return mcpError("Empty skills are rejected because the API behavior is unverified; omit skills to leave them unchanged.");
         assertWriteAllowed(account);
         const body: Record<string, unknown> = { profile_id };
         if (tagline !== undefined) body.tagline = tagline;
