@@ -65,7 +65,7 @@ Returns: profile, reputation, skills, location, hourly rate
 Use when: "Look up this freelancer", "What's their rating?", "Check the profile of user 12345"`,
       inputSchema: z.object({
         username: z.string().optional().describe("Freelancer username"),
-        user_id: z.number().int().optional().describe("Numeric user ID"),
+        user_id: z.number().int().positive().safe().optional().describe("Numeric user ID"),
         account: z.string().optional().describe(ACCOUNT_DESC),
       }),
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true },

@@ -164,6 +164,10 @@ The Freelancer.com public REST API is read-mostly for profiles. After probing th
 - ❌ Experience, education, publications, references, certifications
 - ❌ Portfolio (read-only via API)
 
+## Local input limits
+
+The server applies local limits independently of Freelancer API limits: up to 100 skills or specialty profile IDs per request; skill names up to 100 characters; profile names up to 200, taglines up to 500 and profile descriptions up to 10,000 characters. Search queries are limited to 500 characters and textual thread IDs or URLs to 2,048 characters. Numeric identifiers must be positive safe integers. Project budgets must be nonnegative and the minimum cannot exceed the maximum.
+
 ## Security notes
 
 - Tokens live only in your local MCP client config (or `.env` for `npm run dev`) — never committed, never sent anywhere but Freelancer's own API.

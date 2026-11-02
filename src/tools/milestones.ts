@@ -21,7 +21,7 @@ Milestone statuses include: created, requested, pending, released, cancelled
 
 Use when: "What are the milestones on project 12345?", "Has the milestone been released?", "Check payment status"`,
       inputSchema: z.object({
-        project_id: z.number().int().positive().describe("Project ID to fetch milestones for"),
+        project_id: z.number().int().positive().safe().describe("Project ID to fetch milestones for"),
         account: z.string().optional().describe(ACCOUNT_DESC),
       }),
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },

@@ -77,7 +77,7 @@ Returns: messages with text, sender, timestamp and attachment info
 
 Use when: "Show messages in thread 12345", "What did the client say?", "Read the conversation", "Read this chat: https://www.freelancer.com/messages/thread/12345"`,
       inputSchema: z.object({
-        thread_id: z.union([z.number().int().positive(), z.string().min(1)]).describe("Thread ID, or a chat link containing one"),
+        thread_id: z.union([z.number().int().positive().safe(), z.string().min(1).max(2048)]).describe("Thread ID, or a chat link containing one"),
         limit: z.number().int().min(1).max(MAX_LIMIT).default(20).describe("Number of messages"),
         offset: z.number().int().min(0).default(0).describe("Pagination offset"),
         account: z.string().optional().describe(ACCOUNT_DESC),
@@ -135,7 +135,7 @@ Returns: confirmation with message ID
 
 Use when: "Reply to thread 12345 saying...", "Message the client", "Send a follow-up"`,
       inputSchema: z.object({
-        thread_id: z.union([z.number().int().positive(), z.string().min(1)]).describe("Thread ID to reply to, or a chat link containing one"),
+        thread_id: z.union([z.number().int().positive().safe(), z.string().min(1).max(2048)]).describe("Thread ID to reply to, or a chat link containing one"),
         message: z.string().min(1).max(5000).describe("Message text to send"),
         account: z.string().optional().describe(ACCOUNT_DESC + " This is the account the message is sent FROM."),
       }),

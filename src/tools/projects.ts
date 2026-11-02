@@ -25,10 +25,10 @@ Returns: list of matching projects with title, budget, bid count, skills require
 
 Use when: "Find projects for Zoho CRM", "Show me hourly WordPress jobs", "Any SEO projects available?", "What are the latest projects posted?"`,
       inputSchema: z.object({
-        query: z.string().optional().describe("Search keywords"),
+        query: z.string().max(500).optional().describe("Search keywords"),
         project_type: z.enum(["fixed", "hourly"]).optional().describe("Project type: fixed or hourly"),
-        min_budget: z.number().optional().describe("Minimum budget in USD"),
-        max_budget: z.number().optional().describe("Maximum budget in USD"),
+        min_budget: z.number().finite().nonnegative().optional().describe("Minimum budget in USD"),
+        max_budget: z.number().finite().nonnegative().optional().describe("Maximum budget in USD"),
         limit: z.number().int().min(1).max(MAX_LIMIT).default(DEFAULT_LIMIT).describe("Number of results (max 50)"),
         offset: z.number().int().min(0).default(0).describe("Pagination offset"),
         account: z.string().optional().describe(ACCOUNT_DESC),
@@ -36,6 +36,7 @@ Use when: "Find projects for Zoho CRM", "Show me hourly WordPress jobs", "Any SE
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true },
     },
     async ({ query, project_type, min_budget, max_budget, limit, offset, account }) => {
+      if (min_budget !== undefined && max_budget !== undefined && min_budget > max_budget) return mcpError("Minimum budget must not exceed maximum budget.");
       try {
         const params: Record<string, unknown> = {
           limit,
@@ -90,7 +91,7 @@ Returns: full description, budget, status, skills, bid stats, timeline
 
 Use when: "Tell me more about project 12345678", "Get the details for this project"`,
       inputSchema: z.object({
-        project_id: z.number().int().positive().describe("Numeric Freelancer project ID"),
+        project_id: z.number().int().positive().safe().describe("Numeric Freelancer project ID"),
         account: z.string().optional().describe(ACCOUNT_DESC),
       }),
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },

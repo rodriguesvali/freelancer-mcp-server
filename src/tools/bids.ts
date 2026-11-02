@@ -22,7 +22,7 @@ Returns: list of bids with amount, period, bidder reputation and description
 
 Use when: "Who has bid on project 12345?", "How much are people bidding?", "Show me the bids on my project"`,
       inputSchema: z.object({
-        project_id: z.number().int().positive().describe("Numeric project ID"),
+        project_id: z.number().int().positive().safe().describe("Numeric project ID"),
         limit: z.number().int().min(1).max(MAX_LIMIT).default(DEFAULT_LIMIT).describe("Number of bids"),
         offset: z.number().int().min(0).default(0).describe("Pagination offset"),
         account: z.string().optional().describe(ACCOUNT_DESC),
@@ -147,9 +147,9 @@ Returns: confirmation with bid ID and status
 
 Use when: "Bid $150 on project 12345 with 7 days delivery", "Submit a proposal"`,
       inputSchema: z.object({
-        project_id: z.number().int().positive().describe("Project ID to bid on"),
+        project_id: z.number().int().positive().safe().describe("Project ID to bid on"),
         amount: z.number().positive().describe("Bid amount in project currency"),
-        period: z.number().int().positive().describe("Delivery time in days"),
+        period: z.number().int().positive().safe().describe("Delivery time in days"),
         description: z.string().min(10).max(5000).describe("Proposal / cover letter text"),
         milestone_percentage: z.number().int().min(0).max(100).default(100).describe("Percentage to request as initial milestone (default 100)"),
         account: z.string().optional().describe(ACCOUNT_DESC + " This is the account the bid is placed FROM."),

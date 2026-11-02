@@ -3,6 +3,13 @@ import { z } from "zod";
 import { apiGet, apiPost, apiPut, apiForm, mcpError, truncate, ACCOUNT_DESC } from "../services/api.js";
 import { CHARACTER_LIMIT } from "../constants.js";
 
+// Local request limits, independent of Freelancer API limits.
+const skillName = z.string().trim().min(1).max(100).refine(
+  value => !/^\d+$/.test(value) || (Number.isSafeInteger(Number(value)) && Number(value) > 0),
+  "Numeric skill IDs must be positive safe integers"
+);
+const skillList = z.array(z.union([skillName, z.number().int().positive().safe()])).max(100);
+
 interface FreelancerJob {
   id: number;
   name: string;
@@ -74,7 +81,7 @@ Returns: matching skills with their numeric ID, name and category.
 
 Use when: "Find the skill ID for n8n", "What automation skills exist?", "Search skills for react"`,
       inputSchema: z.object({
-        query: z.string().min(1).describe("Substring to match against skill names"),
+        query: z.string().trim().min(1).max(500).describe("Substring to match against skill names"),
         limit: z.number().int().min(1).max(100).default(25).describe("Max results"),
       }),
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
@@ -161,7 +168,7 @@ Returns: confirmation.
 
 Use when: "Add n8n and Zapier to my skills", "Add skill 3112 to my profile"`,
       inputSchema: z.object({
-        skills: z.array(z.union([z.string(), z.number()])).min(1).describe("Skill names or numeric IDs to add"),
+        skills: skillList.min(1).describe("Skill names or numeric IDs to add"),
         account: z.string().optional().describe(ACCOUNT_DESC),
       }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
@@ -197,7 +204,7 @@ Returns: confirmation.
 
 Use when: "Remove PHP from my skills", "Drop skill 3 from my profile"`,
       inputSchema: z.object({
-        skills: z.array(z.union([z.string(), z.number()])).min(1).describe("Skill names or numeric IDs to remove"),
+        skills: skillList.min(1).describe("Skill names or numeric IDs to remove"),
         account: z.string().optional().describe(ACCOUNT_DESC),
       }),
       annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false },
@@ -233,7 +240,7 @@ Returns: confirmation.
 
 Use when: "Set my skills to exactly Python, n8n and React", "Replace all my skills with this list"`,
       inputSchema: z.object({
-        skills: z.array(z.union([z.string(), z.number()])).min(1).describe("Complete replacement set of skill names or IDs"),
+        skills: skillList.min(1).describe("Complete replacement set of skill names or IDs"),
         account: z.string().optional().describe(ACCOUNT_DESC),
       }),
       annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false },
@@ -269,7 +276,7 @@ Returns: profile details (name, tagline, hourly rate, description).
 
 Use when: "Show specialty profile 12345"`,
       inputSchema: z.object({
-        profile_ids: z.array(z.number().int().positive()).min(1).describe("Numeric specialty-profile IDs"),
+        profile_ids: z.array(z.number().int().positive().safe()).min(1).max(100).describe("Numeric specialty-profile IDs"),
         account: z.string().optional().describe(ACCOUNT_DESC),
       }),
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
@@ -315,11 +322,11 @@ Returns: created profile (including its profile_id).
 
 Use when: "Create a specialty profile for AI automation"`,
       inputSchema: z.object({
-        profile_name: z.string().min(1).describe("Internal name for the specialty profile"),
-        tagline: z.string().min(1).describe("Short headline"),
+        profile_name: z.string().trim().min(1).max(200).describe("Internal name for the specialty profile"),
+        tagline: z.string().trim().min(1).max(500).describe("Short headline"),
         hourly_rate: z.number().positive().describe("Hourly rate in USD"),
-        description: z.string().min(1).describe("Profile description / bio"),
-        skills: z.array(z.union([z.string(), z.number()])).optional().describe("Skill names or IDs"),
+        description: z.string().trim().min(1).max(10000).describe("Profile description / bio"),
+        skills: skillList.optional().describe("Skill names or IDs"),
         account: z.string().optional().describe(ACCOUNT_DESC),
       }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
@@ -362,11 +369,11 @@ Returns: confirmation.
 
 Use when: "Update specialty profile 12345's hourly rate to 40"`,
       inputSchema: z.object({
-        profile_id: z.number().int().positive().describe("Specialty profile numeric ID"),
-        tagline: z.string().optional().describe("Short headline"),
+        profile_id: z.number().int().positive().safe().describe("Specialty profile numeric ID"),
+        tagline: z.string().max(500).optional().describe("Short headline"),
         hourly_rate: z.number().positive().optional().describe("Hourly rate in USD"),
-        description: z.string().optional().describe("Profile description"),
-        skills: z.array(z.union([z.string(), z.number()])).optional().describe("Skill names or IDs (replaces profile skills)"),
+        description: z.string().max(10000).optional().describe("Profile description"),
+        skills: skillList.optional().describe("Skill names or IDs (replaces profile skills)"),
         account: z.string().optional().describe(ACCOUNT_DESC),
       }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },

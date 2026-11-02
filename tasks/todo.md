@@ -1,6 +1,6 @@
 # Tarefas — correções e melhorias
 
-T01 a T03 foram implementadas; as demais tarefas estão pendentes. P0 = urgente; P1 = robustez; P2 = coesão. Plano e decisões: [plan.md](plan.md).
+T01 a T03 e T05 a T07 foram implementadas; as demais tarefas estão pendentes. P0 = urgente; P1 = robustez; P2 = coesão. Plano e decisões: [plan.md](plan.md).
 
 ## T01 [P0]: Criar base mínima de testes
 
@@ -78,7 +78,7 @@ Adicionar configuração explícita de somente leitura, com bloqueio central das
 
 ## T05 [P0]: Corrigir dependência vulnerável
 
-- [ ] **Concluir T05**
+- [x] **Concluir T05**
 
 Revalidar o aviso do Zod e escolher uma versão corrigida compatível com o SDK MCP; atualizar uma dependência direta por vez, sem audit fix --force.
 
@@ -87,15 +87,18 @@ Revalidar o aviso do Zod e escolher uma versão corrigida compatível com o SDK 
 **Arquivos prováveis:** `package.json`, `package-lock.json`, `tests/schema-compatibility.test.ts`.
 
 **Critérios de aceite:**
-- [ ] Registrar versão afetada, aviso atual, alcance e versão corrigida; não presumir que o major atual contém backport.
-- [ ] Schemas, defaults e registro/listagem/chamada MCP continuam compatíveis; não incluir atualização ampla do SDK sem necessidade comprovada.
-- [ ] npm audit não apresenta o aviso corrigido; novos avisos alcançáveis altos/críticos são resolvidos ou registrados com justificativa e data de revisão.
+- [x] Registrar versão afetada, aviso atual, alcance e versão corrigida; não presumir que o major atual contém backport.
+- [x] Schemas, defaults e registro/listagem/chamada MCP continuam compatíveis; não incluir atualização ampla do SDK sem necessidade comprovada.
+- [x] npm audit não apresenta o aviso corrigido; novos avisos alcançáveis altos/críticos são resolvidos ou registrados com justificativa e data de revisão.
 
 **Verificação:** npm ci --ignore-scripts; npm test; npm run build; npm audit; smoke MCP.
 
+Audit: GHSA-mrhx-c7xc-m3w5, Zod 3.25.76 affected; upgraded to 4.6.7. SDK 1.32.2 accepts Zod 4. npm audit reported zero vulnerabilities on 2026-11-02.
+
+
 ## T06 [P1]: Validar skills e listas de perfis
 
-- [ ] **Concluir T06**
+- [x] **Concluir T06**
 
 Validar tipos e limites das coleções antes de resolver nomes ou chamar a API.
 
@@ -104,15 +107,15 @@ Validar tipos e limites das coleções antes de resolver nomes ou chamar a API.
 **Arquivos prováveis:** `src/tools/account.ts`, `src/schemas/account.ts`, `tests/account-inputs.test.ts`.
 
 **Critérios de aceite:**
-- [ ] IDs são inteiros positivos seguros; nomes usam trim e rejeitam vazio; listas têm limite explícito documentado.
-- [ ] Rejeitar números negativos, frações, zero e entradas acima dos limites; preservar deduplicação e erro de nome ambíguo.
-- [ ] Limitar profile_ids, profile_name, tagline e description com base em documentação oficial; limites locais conservadores devem ser identificados como locais.
+- [x] IDs são inteiros positivos seguros; nomes usam trim e rejeitam vazio; listas têm limite explícito documentado.
+- [x] Rejeitar números negativos, frações, zero e entradas acima dos limites; preservar deduplicação e erro de nome ambíguo.
+- [x] Limitar profile_ids, profile_name, tagline e description com base em documentação oficial; limites locais conservadores devem ser identificados como locais.
 
 **Verificação:** Testes nas fronteiras e entradas inválidas; demonstrar zero HTTP em rejeições; npm test; npm run build.
 
 ## T07 [P1]: Completar validação de buscas e valores
 
-- [ ] **Concluir T07**
+- [x] **Concluir T07**
 
 Completar limites e relações entre campos sem ampliar a superfície funcional.
 
@@ -121,9 +124,9 @@ Completar limites e relações entre campos sem ampliar a superfície funcional.
 **Arquivos prováveis:** `src/tools/projects.ts`, `src/tools/bids.ts`, `src/tools/messages.ts`, `tests/tool-inputs.test.ts`.
 
 **Critérios de aceite:**
-- [ ] Orçamentos são finitos, não negativos e min_budget <= max_budget quando ambos existem.
-- [ ] IDs respeitam a faixa segura; query e thread_id textual têm tamanho máximo; preservar limites já existentes de mensagens e propostas.
-- [ ] Documentar restrições locais e testar valores no limite, abaixo e acima; não inventar teto monetário da plataforma.
+- [x] Orçamentos são finitos, não negativos e min_budget <= max_budget quando ambos existem.
+- [x] IDs respeitam a faixa segura; query e thread_id textual têm tamanho máximo; preservar limites já existentes de mensagens e propostas.
+- [x] Documentar restrições locais e testar valores no limite, abaixo e acima; não inventar teto monetário da plataforma.
 
 **Verificação:** Testes de schemas e rejeição antes do HTTP; npm test; npm run build.
 
