@@ -66,26 +66,34 @@ export function assertWriteAllowed(account?: string): void {
   getApiClient(account, true);
 }
 
+function invalidResponse(method: string): Error {
+  return new Error(method === "get"
+    ? "Invalid Freelancer API response."
+    : "Invalid Freelancer API response after a write; the operation may have completed. Check its status before retrying.");
+}
+
 function unwrap<T>(data: unknown, method: string, path: string, params?: Record<string, unknown>): T {
   if (!data || typeof data !== "object" || !("status" in data) || typeof data.status !== "string") {
-    throw new Error("Invalid Freelancer API response.");
+    throw invalidResponse(method);
   }
   if (data.status !== "success") throw new Error("Freelancer API returned an error.");
   if (!("result" in data) || data.result === undefined) {
     if (path === "/users/0.1/self/jobs" && ["post", "put", "delete"].includes(method)) return null as T;
-    throw new Error(method === "get" ? "Invalid Freelancer API response." : "Invalid Freelancer API response after a write; the operation may have completed. Check its status before retrying.");
+    throw invalidResponse(method);
   }
   const schema = resultSchema(method, path, params);
   if (!schema) throw new Error("Unsupported Freelancer API response.");
   const result = schema.safeParse(data.result);
-  if (!result.success) throw new Error(method === "get" ? "Invalid Freelancer API response." : "Invalid Freelancer API response after a write; the operation may have completed. Check its status before retrying.");
+  if (!result.success) throw invalidResponse(method);
   return result.data as T;
 }
 
-function toApiError(error: unknown): Error {
+function toApiError(error: unknown, method: RequestOptions["method"]): Error {
   if (axios.isAxiosError(error)) {
     const status = error.response?.status;
-    return new Error(status ? `Freelancer API request failed (${status}).` : "Freelancer API request failed.");
+    const message = status ? `Freelancer API request failed (${status}).` : "Freelancer API request failed.";
+    const uncertain = method !== "get" && (status === undefined || status === 408 || status >= 500);
+    return new Error(uncertain ? `${message} The operation may have completed. Check its status before retrying.` : message);
   }
   return error instanceof Error ? error : new Error("Freelancer API request failed.");
 }
@@ -123,7 +131,7 @@ async function request<T>({ method, path, account, params, data, form, formExtra
     });
     return unwrap(response.data, method, path, params);
   } catch (error) {
-    throw toApiError(error);
+    throw toApiError(error, method);
   }
 }
 

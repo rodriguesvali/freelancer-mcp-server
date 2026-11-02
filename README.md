@@ -190,6 +190,9 @@ The server applies local limits independently of Freelancer API limits: up to 10
 **"no Freelancer accounts configured"**
 → Set `FREELANCER_OAUTH_TOKEN` or `FREELANCER_ACCOUNTS` in your MCP client config.
 
+**A write reports that the operation may have completed**
+→ Check the message, bid, skills, or profile in Freelancer before trying again. A timeout, server error, or invalid response can leave the outcome uncertain; the server does not automatically retry the write.
+
 **401 Unauthorized**
 → Token expired or wrong. Generate a fresh one at https://accounts.freelancer.com/settings/develop
 

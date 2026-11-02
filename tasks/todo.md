@@ -239,7 +239,7 @@ Unificar serialização de formulário e repetição de tratamento de erro, pres
 
 **Verificação:** Comparação de requisições simuladas antes/depois; npm test; npm run build.
 
-Implementação e testes locais concluídos; fechamento depende da confirmação dos contratos de resposta da T09 e das pendências de T10/T11. A fachada de registro de contas permanece como ponto de composição usado pelo servidor e pelos testes.
+Implementação e testes locais concluídos. Timeout, HTTP 408/5xx e resposta inválida após escrita informam que a operação pode ter sido concluída; testes verificam que não há repetição automática. O fechamento formal depende da confirmação dos contratos da T09.
 
 
 ## T13 [P2]: Separar responsabilidades dos módulos
