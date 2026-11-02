@@ -364,7 +364,7 @@ Args:
   - tagline (string, optional)
   - hourly_rate (number, optional): USD
   - description (string, optional)
-  - skills (string[], optional): Skill names or IDs (replaces this profile's skills)
+  - skills (string[], optional): Non-empty skill names or IDs (replaces this profile's skills). Omit to leave them unchanged; clearing all skills is not supported.
   - account (string, optional): ${ACCOUNT_DESC}
 
 Returns: confirmation.
@@ -380,10 +380,11 @@ Use when: "Update specialty profile 12345's hourly rate to 40"`,
         skills: skillList.optional().describe("Skill names or IDs (replaces profile skills)"),
         account: z.string().optional().describe(ACCOUNT_DESC),
       }),
-      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false },
     },
     async ({ profile_id, tagline, hourly_rate, description, skills, account }) => {
       try {
+        if (skills && skills.length === 0) return mcpError("Empty skills are not supported; omit skills to leave them unchanged.");
         assertWriteAllowed(account);
         const body: Record<string, unknown> = { profile_id };
         if (tagline !== undefined) body.tagline = tagline;

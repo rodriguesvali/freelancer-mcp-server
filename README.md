@@ -164,6 +164,12 @@ The Freelancer.com public REST API is read-mostly for profiles. After probing th
 - ❌ Experience, education, publications, references, certifications
 - ❌ Portfolio (read-only via API)
 
+## Response size
+
+Tool results are limited to 32,768 UTF-8 bytes after JSON serialization, including text and structured content. When a result exceeds this limit, structured content is omitted and the text may be shortened. The result identifies omitted fields and the number of omitted array items. For tools with pagination, repeat the request with a smaller `limit` and the same `offset` to retrieve the omitted data. Other results may require a more targeted query.
+
+For specialty profile updates, omit `skills` to leave skills unchanged. An empty list is rejected because clearing all skills is not confirmed by the API contract.
+
 ## Local input limits
 
 The server applies local limits independently of Freelancer API limits: up to 100 skills or specialty profile IDs per request; skill names up to 100 characters; profile names up to 200, taglines up to 500 and profile descriptions up to 10,000 characters. Search queries are limited to 500 characters and textual thread IDs or URLs to 2,048 characters. Numeric identifiers must be positive safe integers. Project budgets must be nonnegative and the minimum cannot exceed the maximum.

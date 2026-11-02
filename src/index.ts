@@ -2,6 +2,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { initApiClients } from "./services/api.js";
+import { BoundedToolTransport } from "./services/mcp-response.js";
 import { registerProfileTools } from "./tools/profile.js";
 import { registerProjectTools } from "./tools/projects.js";
 import { registerBidTools } from "./tools/bids.js";
@@ -79,7 +80,7 @@ registerMessageTools(server);
 registerAccountTools(server);
 
 async function main(): Promise<void> {
-  const transport = new StdioServerTransport();
+  const transport = new BoundedToolTransport(new StdioServerTransport());
   await server.connect(transport);
   console.error(
     `Freelancer MCP server running via stdio — ${Object.keys(accounts).length} account(s) configured: ${Object.keys(accounts).join(", ")}`

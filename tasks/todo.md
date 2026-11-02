@@ -1,6 +1,6 @@
 # Tarefas — correções e melhorias
 
-T01 a T08 foram implementadas; T09 está em andamento e as demais tarefas estão pendentes. P0 = urgente; P1 = robustez; P2 = coesão. Plano e decisões: [plan.md](plan.md).
+T01 a T08 foram implementadas; T09 está em andamento. T10 e T11 têm implementação e testes locais, com validações externas pendentes. P0 = urgente; P1 = robustez; P2 = coesão. Plano e decisões: [plan.md](plan.md).
 
 ## T01 [P0]: Criar base mínima de testes
 
@@ -189,11 +189,13 @@ Aplicar orçamento ao resultado completo, incluindo structuredContent, por um po
 **Arquivos prováveis:** `src/services/mcp-response.ts`, `src/index.ts`, `tests/output-limits.test.ts`, `README.md`.
 
 **Critérios de aceite:**
-- [ ] Definir orçamento de bytes serializados para content + structuredContent; todas as ferramentas o respeitam.
-- [ ] Truncamento mantém JSON válido e informa campos/itens omitidos e continuidade/paginação quando disponível.
-- [ ] Aplicar projeção dos dados retornados; demonstrar que conteúdo grande em structuredContent não contorna o limite textual.
+- [x] Definir orçamento de bytes serializados para content + structuredContent; todas as ferramentas o respeitam.
+- [x] Truncamento mantém JSON válido e informa campos/itens omitidos e continuidade/paginação quando disponível.
+- [x] Aplicar projeção dos dados retornados; demonstrar que conteúdo grande em structuredContent não contorna o limite textual.
 
 **Verificação:** Testes com mensagens longas, Unicode e coleções grandes; smoke MCP; npm test; npm run build.
+
+Implementado limite de 32768 bytes e testes MCP locais. Conclusão depende da validação externa dos contratos da T09.
 
 ## T11 [P1]: Definir semântica de skills vazias
 
@@ -207,8 +209,8 @@ Distinguir ausência de skills de uma solicitação explícita de remoção de t
 
 **Critérios de aceite:**
 - [ ] Confirmar em documentação oficial ou ambiente de teste se skill_ids vazio limpa as skills; não executar mutações em conta real durante validação.
-- [ ] Se suportado, skills: [] envia limpeza explícita; caso contrário, retorna erro claro sem anunciar sucesso.
-- [ ] skills omitido preserva as skills e uma lista preenchida substitui conforme contrato; revisar destructiveHint da operação de substituição.
+- [x] Se suportado, skills: [] envia limpeza explícita; caso contrário, retorna erro claro sem anunciar sucesso.
+- [x] skills omitido preserva as skills e uma lista preenchida substitui conforme contrato; revisar destructiveHint da operação de substituição.
 
 **Verificação:** Testes dos três casos e inspeção do payload simulado; npm test; npm run build.
 
@@ -217,6 +219,8 @@ Distinguir ausência de skills de uma solicitação explícita de remoção de t
 - [ ] Critérios das tarefas aplicáveis cumpridos, suíte e build passando.
 - [ ] Smoke MCP com HTTP simulado sem regressões; evidências registradas no PR.
 - [ ] Alterações de comportamento documentadas; revisão humana prevista antes de merge.
+
+A documentação acessível não confirmou semântica de lista vazia; rejeição segura implementada e testada. Confirmação oficial ou sandbox segue pendente.
 
 ## T12 [P2]: Concentrar transporte e serialização
 
