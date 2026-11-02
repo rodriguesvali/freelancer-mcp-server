@@ -1,10 +1,10 @@
 # Tarefas — correções e melhorias
 
-Todas as tarefas estão pendentes. P0 = urgente; P1 = robustez; P2 = coesão. Plano e decisões: [plan.md](plan.md).
+T01 a T03 foram implementadas; as demais tarefas estão pendentes. P0 = urgente; P1 = robustez; P2 = coesão. Plano e decisões: [plan.md](plan.md).
 
 ## T01 [P0]: Criar base mínima de testes
 
-- [ ] **Concluir T01**
+- [x] **Concluir T01**
 
 Criar um harness para registrar e chamar ferramentas MCP com transporte HTTP simulado; preferir node:test e compilação TypeScript existente, sem framework adicional se desnecessário.
 
@@ -13,15 +13,15 @@ Criar um harness para registrar e chamar ferramentas MCP com transporte HTTP sim
 **Arquivos prováveis:** `package.json`, `tests/helpers/mcp.ts`, `tests/helpers/http.ts`, `tests/smoke.test.ts`.
 
 **Critérios de aceite:**
-- [ ] npm test executa testes reais e falha diante de uma asserção inválida.
-- [ ] Nenhum teste usa tokens reais ou acessa Freelancer; simular sucesso, erro HTTP e timeout.
-- [ ] Um smoke test inicializa o servidor e lista ferramentas pelo protocolo MCP.
+- [x] npm test executa testes reais e falha diante de uma asserção inválida.
+- [x] Nenhum teste usa tokens reais ou acessa Freelancer; simular sucesso, erro HTTP e timeout.
+- [x] Um smoke test inicializa o servidor e lista ferramentas pelo protocolo MCP.
 
 **Verificação:** npm test; npm run build; smoke MCP local.
 
 ## T02 [P0]: Corrigir identificação de threads
 
-- [ ] **Concluir T02**
+- [x] **Concluir T02**
 
 Substituir a busca pelo último número por parsing explícito de IDs e URLs; cobrir leitura e envio.
 
@@ -30,15 +30,15 @@ Substituir a busca pelo último número por parsing explícito de IDs e URLs; co
 **Arquivos prováveis:** `src/services/api.ts`, `src/tools/messages.ts`, `tests/messages.test.ts`.
 
 **Critérios de aceite:**
-- [ ] thread/123?page=2 e thread/123?project=456 resolvem para 123; cobrir fragmentos.
-- [ ] Aceitar apenas IDs inteiros positivos seguros e formatos de URL documentados; rejeitar domínio externo, host semelhante, zero, Infinity e números fora da faixa segura.
-- [ ] Entrada inválida não gera HTTP; envio válido usa exatamente o thread solicitado.
+- [x] thread/123?page=2 e thread/123?project=456 resolvem para 123; cobrir fragmentos.
+- [x] Aceitar apenas IDs inteiros positivos seguros e formatos de URL documentados; rejeitar domínio externo, host semelhante, zero, Infinity e números fora da faixa segura.
+- [x] Entrada inválida não gera HTTP; envio válido usa exatamente o thread solicitado.
 
 **Verificação:** Testes de regressão no parser e no handler de envio; npm test; npm run build.
 
 ## T03 [P0]: Tornar explícita a conta nas escritas
 
-- [ ] **Concluir T03**
+- [x] **Concluir T03**
 
 Centralizar a seleção de conta por tipo de operação; validar a configuração antes de disponibilizar ferramentas.
 
@@ -47,9 +47,9 @@ Centralizar a seleção de conta por tipo de operação; validar a configuraçã
 **Arquivos prováveis:** `src/services/api.ts`, `src/index.ts`, `src/tools/meta.ts`, `tests/accounts.test.ts`, `README.md`.
 
 **Critérios de aceite:**
-- [ ] Com múltiplas contas, POST/PUT/DELETE sem account ou com account vazio falham antes do HTTP; com uma conta, preservar a omissão.
-- [ ] Leituras mantêm o default documentado; conta desconhecida falha e conta explícita usa apenas seu token.
-- [ ] Configuração multi-conta malformada ou com entradas inválidas falha claramente, sem descartar entradas e continuar com outra conta silenciosamente.
+- [x] Com múltiplas contas, POST/PUT/DELETE sem account ou com account vazio falham antes do HTTP; com uma conta, preservar a omissão.
+- [x] Leituras mantêm o default documentado; conta desconhecida falha e conta explícita usa apenas seu token.
+- [x] Configuração multi-conta malformada ou com entradas inválidas falha claramente, sem descartar entradas e continuar com outra conta silenciosamente.
 
 **Verificação:** Matriz de uma/múltiplas contas, erro de configuração e isolamento de headers; npm test; npm run build.
 

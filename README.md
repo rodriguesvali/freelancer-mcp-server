@@ -53,7 +53,7 @@ Claude will chain `freelancer_my_bids` (status `awarded` vs `rejected`), `freela
 
 ### Chat links and thread IDs
 
-`freelancer_get_messages` and `freelancer_send_message` accept either a plain numeric thread ID or a pasted Freelancer chat/message link — the server extracts the ID either way.
+`freelancer_get_messages` and `freelancer_send_message` accept a positive numeric thread ID or an HTTPS link in the form `https://www.freelancer.com/messages/thread/123`. Query parameters and fragments are ignored. Other link formats must be converted to a thread ID first.
 
 ## See it in action
 
@@ -131,7 +131,7 @@ Or via `claude mcp add`:
 claude mcp add freelancer --env FREELANCER_ACCOUNTS='{"main":"token1","client_acme":"token2"}' -- npx -y freelancer-mcp-server
 ```
 
-The first account listed becomes the default (used when a tool call omits `account`). Ask Claude "which Freelancer accounts are connected?" to confirm, then say e.g. "using the client_acme account, show me the latest projects" to target a specific one. Tokens are never logged, echoed back, or written anywhere by this server — they only ever go into the outgoing `freelancer-oauth-v1` header.
+The first account listed becomes the default for reads. When multiple accounts are configured, every write requires an explicit `account` label; update existing automations to pass it. With one account, the label can be omitted. Invalid account configuration prevents the server from starting. Ask Claude "which Freelancer accounts are connected?" to confirm the labels, then say e.g. "using the client_acme account, show me the latest projects". Tokens are never logged, echoed back, or written anywhere by this server — they only ever go into the outgoing `freelancer-oauth-v1` header.
 
 ### Running from source (contributing)
 

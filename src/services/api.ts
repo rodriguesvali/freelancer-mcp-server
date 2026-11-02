@@ -31,8 +31,11 @@ export function listAccounts(): string[] {
   return Array.from(clients.keys());
 }
 
-function getApiClient(account?: string): AxiosInstance {
-  const label = account || defaultAccount;
+function getApiClient(account?: string, write = false): AxiosInstance {
+  if (write && clients.size > 1 && !account?.trim()) {
+    throw new Error("An explicit account is required for write operations when multiple accounts are configured.");
+  }
+  const label = account === undefined ? defaultAccount : account;
   if (!label) {
     throw new Error(
       "No Freelancer accounts configured. Set FREELANCER_OAUTH_TOKEN (single account) or " +
@@ -87,7 +90,7 @@ export async function apiPost<T>(
   data?: Record<string, unknown>,
   opts?: { form?: boolean; account?: string }
 ): Promise<T> {
-  const client = getApiClient(opts?.account);
+  const client = getApiClient(opts?.account, true);
   try {
     // The Freelancer API expects application/x-www-form-urlencoded for most
     // write endpoints; JSON bodies are silently ignored or rejected.
@@ -118,7 +121,7 @@ export async function apiPut<T>(
   data?: Record<string, unknown>,
   account?: string
 ): Promise<T> {
-  const client = getApiClient(account);
+  const client = getApiClient(account, true);
   try {
     const response = await client.put<ApiResponse<T>>(path, data);
     return unwrap(response.data);
@@ -139,7 +142,7 @@ export async function apiForm<T>(
   scalarParams: Record<string, string | number> = {},
   account?: string
 ): Promise<T> {
-  const client = getApiClient(account);
+  const client = getApiClient(account, true);
   const body = new URLSearchParams();
   for (const [key, values] of Object.entries(arrayParams)) {
     for (const v of values) body.append(`${key}[]`, String(v));
@@ -186,18 +189,28 @@ export function mcpError(message: string): {
 
 /**
  * Accept either a raw numeric thread ID or a Freelancer chat URL
- * (e.g. https://www.freelancer.com/messages/thread/123456 or a
- * project-message deep link containing the thread id) and return the ID.
+ * (e.g. https://www.freelancer.com/messages/thread/123456) and return the ID.
  */
 export function resolveThreadId(input: string | number): number {
-  if (typeof input === "number") return input;
-  const trimmed = input.trim();
-  if (/^\d+$/.test(trimmed)) return Number(trimmed);
-  const match = trimmed.match(/(\d+)(?:\D*)?$/) || trimmed.match(/thread[s]?[/=](\d+)/i);
-  if (match) return Number(match[1]);
-  throw new Error(`Could not extract a thread ID from "${input}". Pass a numeric thread ID or a Freelancer chat link.`);
+  let id: number;
+  if (typeof input === "number") {
+    id = input;
+  } else if (/^\d+$/.test(input.trim())) {
+    id = Number(input.trim());
+  } else {
+    try {
+      const url = new URL(input.trim());
+      const match = /^\/messages\/thread\/(\d+)\/?$/.exec(url.pathname);
+      if (url.protocol !== "https:" || !["freelancer.com", "www.freelancer.com"].includes(url.hostname) || url.port || url.username || url.password || !match) throw new Error();
+      id = Number(match[1]);
+    } catch {
+      throw new Error("Invalid thread ID or Freelancer chat URL.");
+    }
+  }
+  if (!Number.isSafeInteger(id) || id <= 0) throw new Error("Thread ID must be a positive safe integer.");
+  return id;
 }
 
 /** Shared account selector schema description, reused across tool inputs. */
 export const ACCOUNT_DESC =
-  "Which configured Freelancer account to use (see freelancer_list_accounts for labels). Omit to use your default/only account.";
+  "Which configured Freelancer account to use (see freelancer_list_accounts for labels). Required for writes when multiple accounts are configured; otherwise defaults to the first account.";

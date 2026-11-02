@@ -19,27 +19,26 @@ import { registerMetaTools } from "./tools/meta.js";
  * takes an optional `account` argument to pick which one to act as.
  */
 function loadAccounts(): Record<string, string> {
-  const accounts: Record<string, string> = {};
+  const accounts: Record<string, string> = Object.create(null);
 
   const single = process.env.FREELANCER_OAUTH_TOKEN;
   if (single) accounts.default = single;
 
   const multi = process.env.FREELANCER_ACCOUNTS;
-  if (multi) {
+  if (multi !== undefined && multi !== "") {
     try {
       const parsed = JSON.parse(multi);
-      if (parsed && typeof parsed === "object") {
-        for (const [label, token] of Object.entries(parsed)) {
-          if (typeof token === "string" && token.length > 0) {
-            accounts[label] = token;
-          }
-        }
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error();
+      for (const [label, token] of Object.entries(parsed)) {
+        if (!label.trim() || typeof token !== "string" || !token.trim() || Object.hasOwn(accounts, label)) throw new Error();
+        accounts[label] = token;
       }
     } catch {
       console.error(
-        "Warning: FREELANCER_ACCOUNTS is not valid JSON. Expected format: " +
+        "Error: FREELANCER_ACCOUNTS must contain valid unique labels and nonempty tokens. Expected format: " +
           '{"label1":"token1","label2":"token2"}'
       );
+      process.exit(1);
     }
   }
 

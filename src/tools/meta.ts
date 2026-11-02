@@ -11,7 +11,7 @@ export function registerMetaTools(server: McpServer): void {
 
 Use this to discover which \`account\` value to pass to other tools when multiple Freelancer profiles are connected (e.g. your own account plus one or more clients' accounts).
 
-Returns: account labels, and which one is the default (used when a tool call omits \`account\`).
+Returns: account labels, and which one is the default for reads. Writes require an explicit account when multiple accounts are configured.
 
 Use when: "Which Freelancer accounts are connected?", "Switch to the client2 account", "List my connected profiles"`,
       inputSchema: z.object({}),
