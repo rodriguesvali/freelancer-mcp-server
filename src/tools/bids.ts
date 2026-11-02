@@ -32,7 +32,7 @@ Use when: "Who has bid on project 12345?", "How much are people bidding?", "Show
     },
     async ({ project_id, limit, offset, account }) => {
       try {
-        const result = await apiGet<{ bids: FreelancerBid[]; total_count?: number }>(
+        const result = await apiGet(
           "/projects/0.1/bids",
           {
             "project_ids[]": project_id,
@@ -90,7 +90,7 @@ Use when: "Show my bids", "Which of my bids are active?", "Have any of my bids b
     },
     async ({ status, limit, offset, account }) => {
       try {
-        const selfResult = await apiGet<{ id: number }>("/users/0.1/self", undefined, { account });
+        const selfResult = await apiGet("/users/0.1/self", undefined, { account });
         const selfId = selfResult.id;
 
         const params: Record<string, unknown> = {
@@ -101,7 +101,7 @@ Use when: "Show my bids", "Which of my bids are active?", "Have any of my bids b
         };
         if (status) params["statuses[]"] = status;
 
-        const result = await apiGet<{ bids: FreelancerBid[]; total_count?: number }>(
+        const result = await apiGet(
           "/projects/0.1/bids",
           params,
           { account }
@@ -159,7 +159,7 @@ Use when: "Bid $150 on project 12345 with 7 days delivery", "Submit a proposal"`
     },
     async ({ project_id, amount, period, description, milestone_percentage, account }) => {
       try {
-        const result = await apiPost<FreelancerBid>("/projects/0.1/bids", {
+        const result = await apiPost("/projects/0.1/bids", {
           project_id,
           amount,
           period,

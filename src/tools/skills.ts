@@ -11,19 +11,14 @@ const skillName = z.string().trim().min(1).max(100).refine(
 );
 export const skillList = z.array(z.union([skillName, z.number().int().positive().safe()])).max(100);
 
-interface FreelancerJob {
-  id: number;
-  name: string;
-  category?: { id: number; name: string };
-  seo_url?: string;
-}
+import type { FreelancerJob } from "../types.js";
 
 // In-process cache of the full skill catalogue (~3000 entries). Fetched once per server run.
 let jobCatalogue: FreelancerJob[] | null = null;
 
 async function getJobCatalogue(): Promise<FreelancerJob[]> {
   if (jobCatalogue) return jobCatalogue;
-  jobCatalogue = await apiGet<FreelancerJob[]>("/projects/0.1/jobs/");
+  jobCatalogue = await apiGet("/projects/0.1/jobs/");
   return jobCatalogue;
 }
 
@@ -132,7 +127,7 @@ Use when: "What skills are on my profile?", "List my skills", "Do I have n8n lis
     },
     async ({ account }) => {
       try {
-        const self = await apiGet<{ jobs?: FreelancerJob[] }>("/users/0.1/self", { jobs: true }, { account });
+        const self = await apiGet("/users/0.1/self", { jobs: true }, { account });
         const jobs = self.jobs || [];
         if (!jobs.length) {
           return { content: [{ type: "text", text: "No skills listed on your profile." }] };

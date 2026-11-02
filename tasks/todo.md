@@ -165,7 +165,7 @@ Adicionar schemas por endpoint e vincular a seleção de schema ao transporte ce
 
 **Critérios de aceite:**
 - [ ] Cobrir self, usuários, projetos, propostas, milestones, catálogo de skills e specialty profiles, inclusive os retornos de escrita.
-- [ ] Tipos derivam dos schemas quando possível; cada formatter recebe somente a estrutura validada correspondente.
+- [x] Tipos derivam dos schemas quando possível; cada formatter recebe somente a estrutura validada correspondente.
 - [ ] Representar coleções como arrays ou mapas conforme fixtures verificadas; testar campos ausentes e tipos inesperados sem fallback silencioso.
 
 **Verificação:** Testes por família de endpoint com fixtures sanitizadas; npm test; npm run build.
@@ -176,7 +176,7 @@ Adicionar schemas por endpoint e vincular a seleção de schema ao transporte ce
 - [ ] Smoke MCP com HTTP simulado sem regressões; evidências registradas no PR.
 - [ ] Alterações de comportamento documentadas; revisão humana prevista antes de merge.
 
-Progresso: schemas por operação, projeção de campos e testes MCP com exemplos sintéticos adaptados dos testes do SDK oficial (freelancer/freelancer-sdk-python, commit 17b8969d7480f3b9ea38d32e499e6c9bb3dd28b8). Tipos de entidades derivam dos schemas. Variantes do SDK para mensagens, threads, projetos, milestones e propostas foram adicionadas. Pendente: confirmar formatos em documentação atual ou respostas reais sanitizadas; revisar os endpoints não cobertos pelo SDK e associar os tipos de retorno dos helpers ao schema selecionado, pois os genéricos ainda permitem divergência.
+Progresso: tipos de entidades e retornos dos helpers derivam dos schemas por operação, com verificações de compilação. Catálogo de skills, usuários e projetos ativos foram verificados em respostas públicas reais; outros formatos usam fixtures sintéticas do SDK oficial. As evidências e limitações estão em docs/api-contracts.md. Pendente: confirmar endpoints autenticados (incluindo specialty profiles), erros e variantes não cobertas em documentação atual ou sandbox sanitizado.
 
 ## T10 [P1]: Limitar a resposta MCP completa
 

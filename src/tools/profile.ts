@@ -30,7 +30,7 @@ Use when: "What's my profile?", "Show my reputation", "What are my stats on Free
     },
     async ({ account }) => {
       try {
-        const user = await apiGet<FreelancerUser>("/users/0.1/self", {
+        const user = await apiGet("/users/0.1/self", {
           avatar: true,
           reputation: true,
           jobs: true,
@@ -85,7 +85,7 @@ Use when: "Look up this freelancer", "What's their rating?", "Check the profile 
         if (username) params["usernames[]"] = username;
         if (user_id) params["ids[]"] = user_id;
 
-        const result = await apiGet<{ users: Record<string, FreelancerUser> }>(
+        const result = await apiGet(
           "/users/0.1/users",
           params,
           { account }

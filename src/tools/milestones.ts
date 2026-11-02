@@ -29,7 +29,7 @@ Use when: "What are the milestones on project 12345?", "Has the milestone been r
     },
     async ({ project_id, account }) => {
       try {
-        const result = await apiGet<{ milestones: FreelancerMilestone[] }>(
+        const result = await apiGet(
           "/projects/0.1/milestones",
           { "project_ids[]": project_id },
           { account }

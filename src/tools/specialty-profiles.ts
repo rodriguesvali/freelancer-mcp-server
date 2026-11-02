@@ -30,7 +30,7 @@ Use when: "Show specialty profile 12345"`,
     },
     async ({ profile_ids, account }) => {
       try {
-        const result = await apiGet<{ profiles: unknown[] }>("/users/0.1/profiles", {
+        const result = await apiGet("/users/0.1/profiles", {
           "ids[]": profile_ids,
         }, { account });
         const profiles = result.profiles || [];
@@ -83,7 +83,7 @@ Use when: "Create a specialty profile for AI automation"`,
         assertWriteAllowed(account);
         const body: Record<string, unknown> = { profile_name, tagline, hourly_rate, description };
         if (skills?.length) body.skill_ids = await resolveSkillIds(skills);
-        const result = await apiPost<{ profile_id?: number }>("/users/0.1/profiles", body, { account });
+        const result = await apiPost("/users/0.1/profiles", body, { account });
         return {
           content: [{ type: "text", text: `✅ Specialty profile created${result?.profile_id ? ` (ID ${result.profile_id})` : ""}.` }],
           structuredContent: result,
@@ -138,7 +138,7 @@ Use when: "Update specialty profile 12345's hourly rate to 40"`,
         if (Object.keys(body).length === 1) {
           return mcpError("Provide at least one field to update (tagline, hourly_rate, description or skills).");
         }
-        const result = await apiPut<Record<string, unknown>>("/users/0.1/profiles", body, { account });
+        const result = await apiPut("/users/0.1/profiles", body, { account });
         return {
           content: [{ type: "text", text: `✅ Specialty profile ${profile_id} updated.` }],
           structuredContent: { profile_id, result },

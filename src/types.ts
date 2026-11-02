@@ -1,4 +1,5 @@
 export type {
+  FreelancerJob,
   FreelancerUser,
   FreelancerProject,
   FreelancerBid,

@@ -21,6 +21,8 @@ const cases = [
   ['post','/messages/0.1/threads/1/messages',undefined,{id:1}],
   ['post','/users/0.1/profiles',undefined,{profile_id:1}],
   ['put','/users/0.1/profiles',undefined,{profile_id:1}],
+  ['post','/users/0.1/self/jobs',undefined,{}],
+  ['put','/users/0.1/self/jobs',undefined,{}],
   ['delete','/users/0.1/self/jobs',undefined,{}],
 ];
 test('schemas cover every endpoint and reject malformed response types', () => {
@@ -113,4 +115,15 @@ test('SDK-style skill updates may succeed without a result body', async t => {
   initApiClients({main:'fake-token'});
   const {apiForm} = await import('../dist/services/api.js');
   assert.equal(await apiForm('post','/users/0.1/self/jobs',{jobs:[1]}),null);
+});
+
+test('nullable optional fields in public API responses are accepted', () => {
+  const publicProject = {projects:[{id:1,title:'Example',description:null,jobs:null,owner_id:null,status:'active',type:'fixed'}],total_count:1};
+  const publicUser = {users:{'1':{id:1,avatar:null,tagline:null,hourly_rate:null,jobs:null,reputation:null}}};
+  const p = resultSchema('get','/projects/0.1/projects/active').safeParse(publicProject);
+  const u = resultSchema('get','/users/0.1/users').safeParse(publicUser);
+  assert.equal(p.success,true);
+  assert.equal(u.success,true);
+  assert.equal(p.data.projects[0].description,undefined);
+  assert.equal(u.data.users['1'].reputation,undefined);
 });

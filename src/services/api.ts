@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 import { FREELANCER_API_BASE } from "../constants.js";
-import { resultSchema } from "../schemas/responses.js";
+import { resultSchema, getSchemas, postSchemas, putSchemas, sentMessageSchema, skillWriteSchema } from "../schemas/responses.js";
+import type { z } from "zod";
 
 const clients: Map<string, AxiosInstance> = new Map();
 let defaultAccount: string | null = null;
@@ -128,25 +129,31 @@ async function request<T>({ method, path, account, params, data, form, formExtra
 
 type AccountOptions = { account?: string };
 
-export function apiGet<T>(path: string, params?: Record<string, unknown>, opts?: AccountOptions): Promise<T> {
-  return request<T>({ method: "get", path, params, ...opts });
+type GetPath = keyof typeof getSchemas;
+type PostPath = keyof typeof postSchemas | `/messages/0.1/threads/${number}/messages`;
+type PostResult<P extends PostPath> = P extends keyof typeof postSchemas
+  ? z.output<(typeof postSchemas)[P]>
+  : z.output<typeof sentMessageSchema>;
+
+export function apiGet<P extends GetPath>(path: P, params?: Record<string, unknown>, opts?: AccountOptions): Promise<z.output<(typeof getSchemas)[P]>> {
+  return request({ method: "get", path, params, ...opts });
 }
 
-export function apiPost<T>(path: string, data?: Record<string, unknown>, opts?: { form?: boolean; account?: string }): Promise<T> {
-  return request<T>({ method: "post", path, data, ...opts });
+export function apiPost<P extends PostPath>(path: P, data?: Record<string, unknown>, opts?: { form?: boolean; account?: string }): Promise<PostResult<P>> {
+  return request({ method: "post", path, data, ...opts });
 }
 
-export function apiPut<T>(path: string, data?: Record<string, unknown>, opts?: AccountOptions): Promise<T> {
-  return request<T>({ method: "put", path, data, ...opts });
+export function apiPut<P extends keyof typeof putSchemas>(path: P, data?: Record<string, unknown>, opts?: AccountOptions): Promise<z.output<(typeof putSchemas)[P]>> {
+  return request({ method: "put", path, data, ...opts });
 }
 
 /** Serialize array fields as repeated keys (jobs[]=1&jobs[]=2). */
-export function apiForm<T>(
+export function apiForm(
   method: "post" | "put" | "delete",
-  path: string,
+  path: "/users/0.1/self/jobs",
   arrayParams: Record<string, Array<string | number>> = {},
   scalarParams: Record<string, string | number> = {},
   opts?: AccountOptions
-): Promise<T> {
-  return request<T>({ method, path, data: arrayParams, formExtra: scalarParams, form: true, ...opts });
+): Promise<z.output<typeof skillWriteSchema>> {
+  return request({ method, path, data: arrayParams, formExtra: scalarParams, form: true, ...opts });
 }

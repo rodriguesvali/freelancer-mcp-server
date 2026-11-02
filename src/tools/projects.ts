@@ -51,7 +51,7 @@ Use when: "Find projects for Zoho CRM", "Show me hourly WordPress jobs", "Any SE
         if (min_budget !== undefined) params["min_price"] = min_budget;
         if (max_budget !== undefined) params["max_price"] = max_budget;
 
-        const result = await apiGet<{ projects: FreelancerProject[]; total_count?: number }>(
+        const result = await apiGet(
           "/projects/0.1/projects/active",
           params,
           { account }
@@ -99,7 +99,7 @@ Use when: "Tell me more about project 12345678", "Get the details for this proje
     },
     async ({ project_id, account }) => {
       try {
-        const result = await apiGet<{ projects: Record<string, FreelancerProject> | FreelancerProject[] }>(
+        const result = await apiGet(
           "/projects/0.1/projects",
           {
             "ids[]": project_id,
@@ -152,7 +152,7 @@ Use when: "Show my active projects", "List projects I'm working on", "What proje
     },
     async ({ role, status, limit, offset, account }) => {
       try {
-        const selfResult = await apiGet<{ id: number }>("/users/0.1/self", undefined, { account });
+        const selfResult = await apiGet("/users/0.1/self", undefined, { account });
         const selfId = selfResult.id;
 
         const params: Record<string, unknown> = { limit, offset, full_description: false, job_details: true };
@@ -163,13 +163,14 @@ Use when: "Show my active projects", "List projects I'm working on", "What proje
         }
         if (status) params["statuses[]"] = status;
 
-        const result = await apiGet<{ projects: FreelancerProject[]; total_count?: number }>(
+        const result = await apiGet(
           "/projects/0.1/projects",
           params,
           { account }
         );
 
-        if (!result.projects?.length) {
+        if (!Array.isArray(result.projects)) return mcpError("Invalid Freelancer API response.");
+        if (!result.projects.length) {
           return { content: [{ type: "text", text: "No projects found." }] };
         }
 

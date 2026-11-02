@@ -3,7 +3,7 @@ import { z } from "zod";
 import { apiGet, apiPost } from "../services/api.js";
 import { formatDate, mcpError, truncate, ACCOUNT_DESC } from "../services/format.js";
 import { resolveThreadId } from "../services/thread.js";
-import { FreelancerThread, FreelancerMessage, FreelancerSentMessage } from "../types.js";
+import { FreelancerThread, FreelancerMessage } from "../types.js";
 import { CHARACTER_LIMIT, DEFAULT_LIMIT, MAX_LIMIT } from "../constants.js";
 
 export function registerMessageTools(server: McpServer): void {
@@ -36,7 +36,7 @@ Use when: "Show my inbox", "List my message threads", "Who has messaged me?"`,
         const params: Record<string, unknown> = { limit, offset };
         if (context_type) params["context_types[]"] = context_type;
 
-        const result = await apiGet<{ threads: FreelancerThread[]; total_count?: number }>(
+        const result = await apiGet(
           "/messages/0.1/threads",
           params,
           { account }
@@ -89,7 +89,7 @@ Use when: "Show messages in thread 12345", "What did the client say?", "Read the
     async ({ thread_id: thread_id_input, limit, offset, account }) => {
       try {
         const thread_id = resolveThreadId(thread_id_input);
-        const result = await apiGet<{ messages: FreelancerMessage[]; total_count?: number; unfiltered_count?: number }>(
+        const result = await apiGet(
           "/messages/0.1/messages",
           {
             "threads[]": thread_id,
@@ -146,7 +146,7 @@ Use when: "Reply to thread 12345 saying...", "Message the client", "Send a follo
     async ({ thread_id: thread_id_input, message, account }) => {
       try {
         const thread_id = resolveThreadId(thread_id_input);
-        const result = await apiPost<FreelancerSentMessage>(
+        const result = await apiPost(
           `/messages/0.1/threads/${thread_id}/messages`,
           { message },
           { form: true, account }
