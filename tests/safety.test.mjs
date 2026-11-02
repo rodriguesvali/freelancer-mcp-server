@@ -33,17 +33,17 @@ test('MCP reading uses the thread path rather than query parameters', async t =>
 });
 
 test('writes require explicit account only when multiple accounts exist', async t => {
-  const requests = mockHttp(t);
+  const requests = mockHttp(t, () => ({id:42, status:'active'}));
   initApiClients({ main: 'fake-main', client: 'fake-client' });
-  for (const write of [() => apiPost('/test'), () => apiPost('/test', {}, { account: '' }), () => apiPut('/test'), () => apiForm('delete', '/test')]) await assert.rejects(write(), /account/i);
+  for (const write of [() => apiPost('/projects/0.1/bids'), () => apiPost('/projects/0.1/bids', {}, { account: '' }), () => apiPut('/users/0.1/profiles'), () => apiForm('delete', '/users/0.1/self/jobs')]) await assert.rejects(write(), /account/i);
   assert.equal(requests.length, 0);
-  await apiGet('/test');
-  await apiPost('/test', {}, { account: 'client' });
+  await apiGet('/users/0.1/self');
+  await apiPost('/projects/0.1/bids', {}, { account: 'client' });
   assert.equal(requests[0].headers.get('freelancer-oauth-v1'), 'fake-main');
   assert.equal(requests[1].headers.get('freelancer-oauth-v1'), 'fake-client');
-  await assert.rejects(apiPost('/test', {}, { account: 'missing' }), /unknown account/i);
+  await assert.rejects(apiPost('/projects/0.1/bids', {}, { account: 'missing' }), /unknown account/i);
   initApiClients({ main: 'fake-main' });
-  await apiPost('/test');
+  await apiPost('/projects/0.1/bids');
   assert.equal(requests[2].headers.get('freelancer-oauth-v1'), 'fake-main');
 });
 

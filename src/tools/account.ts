@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { apiGet, apiPost, apiPut, apiForm, mcpError, truncate, ACCOUNT_DESC } from "../services/api.js";
+import { apiGet, apiPost, apiPut, apiForm, assertWriteAllowed, mcpError, truncate, ACCOUNT_DESC } from "../services/api.js";
 import { CHARACTER_LIMIT } from "../constants.js";
 
 // Local request limits, independent of Freelancer API limits.
@@ -175,6 +175,7 @@ Use when: "Add n8n and Zapier to my skills", "Add skill 3112 to my profile"`,
     },
     async ({ skills, account }) => {
       try {
+        assertWriteAllowed(account);
         const ids = await resolveSkillIds(skills);
         await apiForm("post", "/users/0.1/self/jobs", { jobs: ids }, {}, account);
         return {
@@ -211,6 +212,7 @@ Use when: "Remove PHP from my skills", "Drop skill 3 from my profile"`,
     },
     async ({ skills, account }) => {
       try {
+        assertWriteAllowed(account);
         const ids = await resolveSkillIds(skills);
         await apiForm("delete", "/users/0.1/self/jobs", { jobs: ids }, {}, account);
         return {
@@ -247,6 +249,7 @@ Use when: "Set my skills to exactly Python, n8n and React", "Replace all my skil
     },
     async ({ skills, account }) => {
       try {
+        assertWriteAllowed(account);
         const ids = await resolveSkillIds(skills);
         await apiForm("put", "/users/0.1/self/jobs", { jobs: ids }, {}, account);
         return {
@@ -333,6 +336,7 @@ Use when: "Create a specialty profile for AI automation"`,
     },
     async ({ profile_name, tagline, hourly_rate, description, skills, account }) => {
       try {
+        assertWriteAllowed(account);
         const body: Record<string, unknown> = { profile_name, tagline, hourly_rate, description };
         if (skills?.length) body.skill_ids = await resolveSkillIds(skills);
         const result = await apiPost<{ profile_id?: number }>("/users/0.1/profiles", body, { account });
@@ -380,6 +384,7 @@ Use when: "Update specialty profile 12345's hourly rate to 40"`,
     },
     async ({ profile_id, tagline, hourly_rate, description, skills, account }) => {
       try {
+        assertWriteAllowed(account);
         const body: Record<string, unknown> = { profile_id };
         if (tagline !== undefined) body.tagline = tagline;
         if (hourly_rate !== undefined) body.hourly_rate = hourly_rate;

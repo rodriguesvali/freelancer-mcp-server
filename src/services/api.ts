@@ -1,6 +1,6 @@
-import axios, { AxiosInstance, AxiosError } from "axios";
+import axios, { AxiosInstance } from "axios";
 import { FREELANCER_API_BASE } from "../constants.js";
-import { ApiResponse } from "../types.js";
+import { resultSchema } from "../schemas/responses.js";
 
 const clients: Map<string, AxiosInstance> = new Map();
 let defaultAccount: string | null = null;
@@ -31,7 +31,16 @@ export function listAccounts(): string[] {
   return Array.from(clients.keys());
 }
 
+export function assertWritesEnabled(): void {
+  const mode = process.env.FREELANCER_READ_ONLY;
+  if (mode !== undefined && mode !== "true" && mode !== "false") {
+    throw new Error("FREELANCER_READ_ONLY must be true or false.");
+  }
+  if (mode === "true") throw new Error("Server is in read-only mode.");
+}
+
 function getApiClient(account?: string, write = false): AxiosInstance {
+  if (write) assertWritesEnabled();
   if (write && clients.size > 1 && !account?.trim()) {
     throw new Error("An explicit account is required for write operations when multiple accounts are configured.");
   }
@@ -52,23 +61,29 @@ function getApiClient(account?: string, write = false): AxiosInstance {
   return client;
 }
 
-function unwrap<T>(data: ApiResponse<T>): T {
-  if (data.status !== "success") {
-    throw new Error(data.message || data.error_code || "API returned non-success status");
+export function assertWriteAllowed(account?: string): void {
+  getApiClient(account, true);
+}
+
+function unwrap<T>(data: unknown, method: string, path: string, params?: Record<string, unknown>): T {
+  if (!data || typeof data !== "object" || !("status" in data) || typeof data.status !== "string") {
+    throw new Error("Invalid Freelancer API response.");
   }
-  return data.result;
+  if (data.status !== "success") throw new Error("Freelancer API returned an error.");
+  if (!("result" in data) || data.result === undefined) throw new Error("Invalid Freelancer API response.");
+  const schema = resultSchema(method, path, params);
+  if (!schema) throw new Error("Unsupported Freelancer API response.");
+  const result = schema.safeParse(data.result);
+  if (!result.success) throw new Error(method === "get" ? "Invalid Freelancer API response." : "Invalid Freelancer API response after a write; the operation may have completed. Check its status before retrying.");
+  return result.data as T;
 }
 
 function toApiError(error: unknown): Error {
   if (axios.isAxiosError(error)) {
-    const axiosErr = error as AxiosError<ApiResponse<unknown>>;
-    const msg =
-      axiosErr.response?.data?.message ||
-      axiosErr.response?.data?.error_code ||
-      axiosErr.message;
-    return new Error(`Freelancer API error (${axiosErr.response?.status}): ${msg}`);
+    const status = error.response?.status;
+    return new Error(status ? `Freelancer API request failed (${status}).` : "Freelancer API request failed.");
   }
-  return error as Error;
+  return error instanceof Error ? error : new Error("Freelancer API request failed.");
 }
 
 export async function apiGet<T>(
@@ -78,8 +93,8 @@ export async function apiGet<T>(
 ): Promise<T> {
   const client = getApiClient(account);
   try {
-    const response = await client.get<ApiResponse<T>>(path, { params });
-    return unwrap(response.data);
+    const response = await client.get<unknown>(path, { params });
+    return unwrap(response.data, "get", path, params);
   } catch (error) {
     throw toApiError(error);
   }
@@ -109,8 +124,8 @@ export async function apiPost<T>(
       body = params.toString();
       config = { headers: { "Content-Type": "application/x-www-form-urlencoded" } };
     }
-    const response = await client.post<ApiResponse<T>>(path, body, config);
-    return unwrap(response.data);
+    const response = await client.post<unknown>(path, body, config);
+    return unwrap(response.data, "post", path);
   } catch (error) {
     throw toApiError(error);
   }
@@ -123,8 +138,8 @@ export async function apiPut<T>(
 ): Promise<T> {
   const client = getApiClient(account, true);
   try {
-    const response = await client.put<ApiResponse<T>>(path, data);
-    return unwrap(response.data);
+    const response = await client.put<unknown>(path, data);
+    return unwrap(response.data, "put", path);
   } catch (error) {
     throw toApiError(error);
   }
@@ -151,13 +166,13 @@ export async function apiForm<T>(
     body.append(key, String(value));
   }
   try {
-    const response = await client.request<ApiResponse<T>>({
+    const response = await client.request<unknown>({
       method,
       url: path,
       data: body.toString(),
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
     });
-    return unwrap(response.data);
+    return unwrap(response.data, method, path);
   } catch (error) {
     throw toApiError(error);
   }

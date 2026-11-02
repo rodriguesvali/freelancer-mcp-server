@@ -172,7 +172,7 @@ The server applies local limits independently of Freelancer API limits: up to 10
 
 - Tokens live only in your local MCP client config (or `.env` for `npm run dev`) — never committed, never sent anywhere but Freelancer's own API.
 - The server runs entirely on your machine; no telemetry, no third-party calls.
-- Destructive/real-world actions (`place_bid`, `send_message`, skill/profile edits) always surface for your review before they execute, since Claude shows tool calls before running them.
+- Write operations are enabled by default for compatibility. Set `FREELANCER_READ_ONLY=true` in the MCP environment to block messages, bids and profile/skill changes; set it to `false` or omit it to enable writes. Invalid values prevent startup. Approval of tool calls depends on your MCP client and its settings; the server does not provide a human confirmation step.
 - This repo contains no data from, and no dependency on, any other project — it's a clean, standalone Freelancer.com integration.
 
 ## Troubleshooting

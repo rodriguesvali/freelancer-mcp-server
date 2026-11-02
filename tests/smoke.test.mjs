@@ -30,8 +30,8 @@ test("HTTP adapter simulates success with the configured timeout", async (t) => 
 });
 
 for (const [name, failure, expected] of [
-  ["HTTP error", httpError, /403.*Access denied/],
-  ["timeout", timeoutError, /timeout of 15000ms exceeded/],
+  ["HTTP error", httpError, /failed \(403\)/],
+  ["timeout", timeoutError, /request failed/],
 ]) {
   test(`HTTP adapter simulates ${name}`, async (t) => {
     const requests = mockHttp(t, (config) => { throw failure(config); });

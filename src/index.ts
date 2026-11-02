@@ -45,6 +45,11 @@ function loadAccounts(): Record<string, string> {
   return accounts;
 }
 
+if (process.env.FREELANCER_READ_ONLY !== undefined && !["true", "false"].includes(process.env.FREELANCER_READ_ONLY)) {
+  console.error("Error: FREELANCER_READ_ONLY must be true or false.");
+  process.exit(1);
+}
+
 const accounts = loadAccounts();
 
 if (Object.keys(accounts).length === 0) {

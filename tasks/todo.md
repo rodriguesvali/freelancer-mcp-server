@@ -1,6 +1,6 @@
 # Tarefas — correções e melhorias
 
-T01 a T03 e T05 a T07 foram implementadas; as demais tarefas estão pendentes. P0 = urgente; P1 = robustez; P2 = coesão. Plano e decisões: [plan.md](plan.md).
+T01 a T08 foram implementadas; T09 está em andamento e as demais tarefas estão pendentes. P0 = urgente; P1 = robustez; P2 = coesão. Plano e decisões: [plan.md](plan.md).
 
 ## T01 [P0]: Criar base mínima de testes
 
@@ -61,7 +61,7 @@ Centralizar a seleção de conta por tipo de operação; validar a configuraçã
 
 ## T04 [P1]: Definir controle de capacidade de escrita
 
-- [ ] **Concluir T04**
+- [x] **Concluir T04**
 
 Adicionar configuração explícita de somente leitura, com bloqueio central das operações de escrita; documentar que aprovação humana depende do cliente MCP.
 
@@ -70,9 +70,9 @@ Adicionar configuração explícita de somente leitura, com bloqueio central das
 **Arquivos prováveis:** `src/index.ts`, `src/services/api.ts`, `tests/write-policy.test.ts`, `README.md`.
 
 **Critérios de aceite:**
-- [ ] Modo somente leitura bloqueia todas as mutações antes do HTTP e preserva consultas.
-- [ ] Modo com escrita habilitada permite apenas operações com seleção de conta válida; testar propostas, mensagens, skills e perfis.
-- [ ] README remove a garantia universal de confirmação e descreve a política, seu padrão e a migração; definir o padrão como decisão de compatibilidade antes de implementar.
+- [x] Modo somente leitura bloqueia todas as mutações antes do HTTP e preserva consultas.
+- [x] Modo com escrita habilitada permite apenas operações com seleção de conta válida; testar propostas, mensagens, skills e perfis.
+- [x] README remove a garantia universal de confirmação e descreve a política, seu padrão e a migração; definir o padrão como decisão de compatibilidade antes de implementar.
 
 **Verificação:** Testes de política cobrindo todas as ferramentas mutáveis; npm test; npm run build.
 
@@ -138,7 +138,7 @@ Completar limites e relações entre campos sem ampliar a superfície funcional.
 
 ## T08 [P1]: Validar envelope e respostas de mensagens
 
-- [ ] **Concluir T08**
+- [x] **Concluir T08**
 
 Tratar a resposta HTTP como unknown; validar envelope e estruturas consumidas pelas ferramentas de mensagens.
 
@@ -147,9 +147,9 @@ Tratar a resposta HTTP como unknown; validar envelope e estruturas consumidas pe
 **Arquivos prováveis:** `src/services/api.ts`, `src/schemas/messages.ts`, `src/tools/messages.ts`, `tests/message-responses.test.ts`.
 
 **Critérios de aceite:**
-- [ ] Distinguir sucesso, erro da API e resposta malformada; sucesso exige result válido para a operação.
-- [ ] Validar threads, mensagens e campos necessários antes da formatação; tolerar campos adicionais sem repassá-los automaticamente.
-- [ ] Erros devolvidos ao MCP não contêm tokens, headers ou stack traces; fixtures inválidas falham de modo previsível.
+- [x] Distinguir sucesso, erro da API e resposta malformada; sucesso exige result válido para a operação.
+- [x] Validar threads, mensagens e campos necessários antes da formatação; tolerar campos adicionais sem repassá-los automaticamente.
+- [x] Erros devolvidos ao MCP não contêm tokens, headers ou stack traces; fixtures inválidas falham de modo previsível.
 
 **Verificação:** Fixtures de sucesso/erro/malformação e teste de não exposição; npm test; npm run build.
 
@@ -175,6 +175,8 @@ Adicionar schemas por endpoint e vincular a seleção de schema ao transporte ce
 - [ ] Critérios das tarefas aplicáveis cumpridos, suíte e build passando.
 - [ ] Smoke MCP com HTTP simulado sem regressões; evidências registradas no PR.
 - [ ] Alterações de comportamento documentadas; revisão humana prevista antes de merge.
+
+Progresso: schemas por operação, projeção de campos e testes com fixtures sintéticas implementados. Pendente: confrontar formatos com documentação ou fixtures reais sanitizadas e derivar tipos dos schemas; os tipos genéricos atuais não provam a correspondência com o schema.
 
 ## T10 [P1]: Limitar a resposta MCP completa
 
