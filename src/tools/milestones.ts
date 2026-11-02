@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { apiGet, formatDate, mcpError, truncate, ACCOUNT_DESC } from "../services/api.js";
+import { apiGet } from "../services/api.js";
+import { formatDate, mcpError, truncate, ACCOUNT_DESC } from "../services/format.js";
 import { FreelancerMilestone } from "../types.js";
 import { CHARACTER_LIMIT } from "../constants.js";
 
@@ -31,7 +32,7 @@ Use when: "What are the milestones on project 12345?", "Has the milestone been r
         const result = await apiGet<{ milestones: FreelancerMilestone[] }>(
           "/projects/0.1/milestones",
           { "project_ids[]": project_id },
-          account
+          { account }
         );
 
         if (!result.milestones?.length) {

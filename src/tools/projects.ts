@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { apiGet, formatDate, mcpError, truncate, ACCOUNT_DESC } from "../services/api.js";
+import { apiGet } from "../services/api.js";
+import { formatDate, mcpError, truncate, ACCOUNT_DESC } from "../services/format.js";
 import { FreelancerProject } from "../types.js";
 import { CHARACTER_LIMIT, DEFAULT_LIMIT, MAX_LIMIT } from "../constants.js";
 
@@ -53,7 +54,7 @@ Use when: "Find projects for Zoho CRM", "Show me hourly WordPress jobs", "Any SE
         const result = await apiGet<{ projects: FreelancerProject[]; total_count: number }>(
           "/projects/0.1/projects/active",
           params,
-          account
+          { account }
         );
 
         if (!result.projects?.length) {
@@ -106,7 +107,7 @@ Use when: "Tell me more about project 12345678", "Get the details for this proje
             job_details: true,
             upgrade_details: true,
           },
-          account
+          { account }
         );
 
         const project = Object.values(result.projects)[0];
@@ -151,7 +152,7 @@ Use when: "Show my active projects", "List projects I'm working on", "What proje
     },
     async ({ role, status, limit, offset, account }) => {
       try {
-        const selfResult = await apiGet<{ id: number }>("/users/0.1/self", undefined, account);
+        const selfResult = await apiGet<{ id: number }>("/users/0.1/self", undefined, { account });
         const selfId = selfResult.id;
 
         const params: Record<string, unknown> = { limit, offset, full_description: false, job_details: true };
@@ -165,7 +166,7 @@ Use when: "Show my active projects", "List projects I'm working on", "What proje
         const result = await apiGet<{ projects: FreelancerProject[]; total_count: number }>(
           "/projects/0.1/projects",
           params,
-          account
+          { account }
         );
 
         if (!result.projects?.length) {

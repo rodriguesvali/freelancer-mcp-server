@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { apiGet, formatDate, mcpError, truncate, ACCOUNT_DESC } from "../services/api.js";
+import { apiGet } from "../services/api.js";
+import { formatDate, mcpError, truncate, ACCOUNT_DESC } from "../services/format.js";
 import { FreelancerUser } from "../types.js";
 import { CHARACTER_LIMIT } from "../constants.js";
 
@@ -35,7 +36,7 @@ Use when: "What's my profile?", "Show my reputation", "What are my stats on Free
           jobs: true,
           location_details: true,
           earnings: true,
-        }, account);
+        }, { account });
 
         const text = formatUserProfile(user);
         return {
@@ -87,7 +88,7 @@ Use when: "Look up this freelancer", "What's their rating?", "Check the profile 
         const result = await apiGet<{ users: Record<string, FreelancerUser> }>(
           "/users/0.1/users",
           params,
-          account
+          { account }
         );
 
         const users = Object.values(result.users);

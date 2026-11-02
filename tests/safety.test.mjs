@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { spawnSync } from 'node:child_process';
-import { resolveThreadId, initApiClients, apiGet, apiPost, apiPut, apiForm } from '../dist/services/api.js';
+import { initApiClients, apiGet, apiPost, apiPut, apiForm } from '../dist/services/api.js';
+import { resolveThreadId } from '../dist/services/thread.js';
 import { mockHttp } from './helpers/http.mjs';
 import { messageClient } from './helpers/mcp.mjs';
 

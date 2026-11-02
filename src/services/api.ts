@@ -123,16 +123,18 @@ async function request<T>({ method, path, account, params, data, form, formExtra
   }
 }
 
-export function apiGet<T>(path: string, params?: Record<string, unknown>, account?: string): Promise<T> {
-  return request<T>({ method: "get", path, params, account });
+type AccountOptions = { account?: string };
+
+export function apiGet<T>(path: string, params?: Record<string, unknown>, opts?: AccountOptions): Promise<T> {
+  return request<T>({ method: "get", path, params, ...opts });
 }
 
 export function apiPost<T>(path: string, data?: Record<string, unknown>, opts?: { form?: boolean; account?: string }): Promise<T> {
   return request<T>({ method: "post", path, data, ...opts });
 }
 
-export function apiPut<T>(path: string, data?: Record<string, unknown>, account?: string): Promise<T> {
-  return request<T>({ method: "put", path, data, account });
+export function apiPut<T>(path: string, data?: Record<string, unknown>, opts?: AccountOptions): Promise<T> {
+  return request<T>({ method: "put", path, data, ...opts });
 }
 
 /** Serialize array fields as repeated keys (jobs[]=1&jobs[]=2). */
@@ -141,59 +143,7 @@ export function apiForm<T>(
   path: string,
   arrayParams: Record<string, Array<string | number>> = {},
   scalarParams: Record<string, string | number> = {},
-  account?: string
+  opts?: AccountOptions
 ): Promise<T> {
-  return request<T>({ method, path, data: arrayParams, formExtra: scalarParams, form: true, account });
+  return request<T>({ method, path, data: arrayParams, formExtra: scalarParams, form: true, ...opts });
 }
-
-export function truncate(text: string, limit: number): string {
-  if (text.length <= limit) return text;
-  return text.slice(0, limit) + `\n\n[Truncated — ${text.length - limit} characters omitted]`;
-}
-
-export function formatDate(unix?: number): string {
-  if (!unix) return "unknown";
-  return new Date(unix * 1000).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-export function mcpError(message: string): {
-  content: Array<{ type: "text"; text: string }>;
-  isError: true;
-} {
-  return {
-    content: [{ type: "text", text: `Error: ${message}` }],
-    isError: true,
-  };
-}
-
-/**
- * Accept either a raw numeric thread ID or a Freelancer chat URL
- * (e.g. https://www.freelancer.com/messages/thread/123456) and return the ID.
- */
-export function resolveThreadId(input: string | number): number {
-  let id: number;
-  if (typeof input === "number") {
-    id = input;
-  } else if (/^\d+$/.test(input.trim())) {
-    id = Number(input.trim());
-  } else {
-    try {
-      const url = new URL(input.trim());
-      const match = /^\/messages\/thread\/(\d+)\/?$/.exec(url.pathname);
-      if (url.protocol !== "https:" || !["freelancer.com", "www.freelancer.com"].includes(url.hostname) || url.port || url.username || url.password || !match) throw new Error();
-      id = Number(match[1]);
-    } catch {
-      throw new Error("Invalid thread ID or Freelancer chat URL.");
-    }
-  }
-  if (!Number.isSafeInteger(id) || id <= 0) throw new Error("Thread ID must be a positive safe integer.");
-  return id;
-}
-
-/** Shared account selector schema description, reused across tool inputs. */
-export const ACCOUNT_DESC =
-  "Which configured Freelancer account to use (see freelancer_list_accounts for labels). Required for writes when multiple accounts are configured; otherwise defaults to the first account.";

@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { apiGet, apiPost, formatDate, mcpError, truncate, ACCOUNT_DESC } from "../services/api.js";
+import { apiGet, apiPost } from "../services/api.js";
+import { formatDate, mcpError, truncate, ACCOUNT_DESC } from "../services/format.js";
 import { FreelancerBid } from "../types.js";
 import { CHARACTER_LIMIT, DEFAULT_LIMIT, MAX_LIMIT } from "../constants.js";
 
@@ -40,7 +41,7 @@ Use when: "Who has bid on project 12345?", "How much are people bidding?", "Show
             reputation_details: true,
             bidder_details: true,
           },
-          account
+          { account }
         );
 
         if (!result.bids?.length) {
@@ -89,7 +90,7 @@ Use when: "Show my bids", "Which of my bids are active?", "Have any of my bids b
     },
     async ({ status, limit, offset, account }) => {
       try {
-        const selfResult = await apiGet<{ id: number }>("/users/0.1/self", undefined, account);
+        const selfResult = await apiGet<{ id: number }>("/users/0.1/self", undefined, { account });
         const selfId = selfResult.id;
 
         const params: Record<string, unknown> = {
@@ -103,7 +104,7 @@ Use when: "Show my bids", "Which of my bids are active?", "Have any of my bids b
         const result = await apiGet<{ bids: FreelancerBid[]; total_count: number }>(
           "/projects/0.1/bids",
           params,
-          account
+          { account }
         );
 
         if (!result.bids?.length) {

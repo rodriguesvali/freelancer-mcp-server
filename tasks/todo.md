@@ -1,6 +1,6 @@
 # Tarefas — correções e melhorias
 
-T01 a T08 foram implementadas; T09 está em andamento. T10 e T11 têm implementação e testes locais, com validações externas pendentes. P0 = urgente; P1 = robustez; P2 = coesão. Plano e decisões: [plan.md](plan.md).
+T01 a T08 foram implementadas; T09 está em andamento. T10 a T13 têm implementação e testes locais, com validações externas e dependências pendentes. P0 = urgente; P1 = robustez; P2 = coesão. Plano e decisões: [plan.md](plan.md).
 
 ## T01 [P0]: Criar base mínima de testes
 
@@ -233,11 +233,14 @@ Unificar serialização de formulário e repetição de tratamento de erro, pres
 **Arquivos prováveis:** `src/services/api.ts`, `src/services/form.ts`, `tests/http-serialization.test.ts`.
 
 **Critérios de aceite:**
-- [ ] Um serializador canônico atende apiPost(form) e apiForm; testar arrays, escalares e valores opcionais.
-- [ ] Um fluxo central mantém timeout, conta, política de escrita e validação; preservar JSON nos endpoints que o exigem.
-- [ ] Caracterização comprova mesmos métodos, caminhos, headers e corpos; nenhuma tentativa automática de repetir escritas não idempotentes é introduzida.
+- [x] Um serializador canônico atende apiPost(form) e apiForm; testar arrays, escalares e valores opcionais.
+- [x] Um fluxo central mantém timeout, conta, política de escrita e validação; preservar JSON nos endpoints que o exigem.
+- [x] Caracterização comprova mesmos métodos, caminhos, headers e corpos; nenhuma tentativa automática de repetir escritas não idempotentes é introduzida.
 
 **Verificação:** Comparação de requisições simuladas antes/depois; npm test; npm run build.
+
+Implementação e testes locais concluídos; fechamento depende da confirmação dos contratos de resposta da T09 e das pendências de T10/T11. A fachada de registro de contas permanece como ponto de composição usado pelo servidor e pelos testes.
+
 
 ## T13 [P2]: Separar responsabilidades dos módulos
 
@@ -250,11 +253,14 @@ Separar skills de specialty profiles, mantendo registerAccountTools como fachada
 **Arquivos prováveis:** `src/services/api.ts`, `src/tools/account.ts`, `src/tools/skills.ts`, `src/tools/specialty-profiles.ts`, `src/index.ts`.
 
 **Critérios de aceite:**
-- [ ] Ferramentas mantêm nomes, schemas públicos e resultados já corrigidos; snapshot de tools/list permanece equivalente.
-- [ ] Transporte não contém formatação nem parsing de links; catálogo e resolução de skills têm um único proprietário.
+- [x] Ferramentas mantêm nomes, schemas públicos e resultados já corrigidos; snapshot de tools/list permanece equivalente.
+- [x] Transporte não contém formatação nem parsing de links; catálogo e resolução de skills têm um único proprietário.
 - [ ] Padronizar opções internas de account, formato e método no transporte, adaptando chamadores em lotes pequenos; remover fachada apenas após eliminar consumidores.
 
 **Verificação:** Testes de caracterização e smoke MCP após cada extração; npm test; npm run build.
+
+
+Implementação e testes locais concluídos; fechamento depende da confirmação dos contratos de resposta da T09 e das pendências de T10/T11. A fachada de registro de contas permanece como ponto de composição usado pelo servidor e pelos testes.
 
 ### Checkpoint E — coesão
 

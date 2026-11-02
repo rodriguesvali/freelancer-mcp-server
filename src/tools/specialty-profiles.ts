@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { apiGet, apiPost, apiPut, assertWriteAllowed, mcpError, truncate, ACCOUNT_DESC } from "../services/api.js";
+import { apiGet, apiPost, apiPut, assertWriteAllowed } from "../services/api.js";
+import { mcpError, truncate, ACCOUNT_DESC } from "../services/format.js";
 import { CHARACTER_LIMIT } from "../constants.js";
 import { skillList, resolveSkillIds } from "./skills.js";
 
@@ -31,7 +32,7 @@ Use when: "Show specialty profile 12345"`,
       try {
         const result = await apiGet<{ profiles: unknown[] }>("/users/0.1/profiles", {
           "ids[]": profile_ids,
-        }, account);
+        }, { account });
         const profiles = result.profiles || [];
         if (!profiles.length) {
           return { content: [{ type: "text", text: "No profiles found for those IDs." }] };
@@ -137,7 +138,7 @@ Use when: "Update specialty profile 12345's hourly rate to 40"`,
         if (Object.keys(body).length === 1) {
           return mcpError("Provide at least one field to update (tagline, hourly_rate, description or skills).");
         }
-        const result = await apiPut<Record<string, unknown>>("/users/0.1/profiles", body, account);
+        const result = await apiPut<Record<string, unknown>>("/users/0.1/profiles", body, { account });
         return {
           content: [{ type: "text", text: `✅ Specialty profile ${profile_id} updated.` }],
           structuredContent: { profile_id, result },

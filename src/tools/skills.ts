@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { apiGet, apiPost, apiPut, apiForm, assertWriteAllowed, mcpError, truncate, ACCOUNT_DESC } from "../services/api.js";
+import { apiGet, apiForm, assertWriteAllowed } from "../services/api.js";
+import { mcpError, truncate, ACCOUNT_DESC } from "../services/format.js";
 import { CHARACTER_LIMIT } from "../constants.js";
 
 // Local request limits, independent of Freelancer API limits.
@@ -131,7 +132,7 @@ Use when: "What skills are on my profile?", "List my skills", "Do I have n8n lis
     },
     async ({ account }) => {
       try {
-        const self = await apiGet<{ jobs?: FreelancerJob[] }>("/users/0.1/self", { jobs: true }, account);
+        const self = await apiGet<{ jobs?: FreelancerJob[] }>("/users/0.1/self", { jobs: true }, { account });
         const jobs = self.jobs || [];
         if (!jobs.length) {
           return { content: [{ type: "text", text: "No skills listed on your profile." }] };
@@ -177,7 +178,7 @@ Use when: "Add n8n and Zapier to my skills", "Add skill 3112 to my profile"`,
       try {
         assertWriteAllowed(account);
         const ids = await resolveSkillIds(skills);
-        await apiForm("post", "/users/0.1/self/jobs", { jobs: ids }, {}, account);
+        await apiForm("post", "/users/0.1/self/jobs", { jobs: ids }, {}, { account });
         return {
           content: [{ type: "text", text: `✅ Added ${ids.length} skill(s): IDs ${ids.join(", ")}.` }],
           structuredContent: { added: ids },
@@ -214,7 +215,7 @@ Use when: "Remove PHP from my skills", "Drop skill 3 from my profile"`,
       try {
         assertWriteAllowed(account);
         const ids = await resolveSkillIds(skills);
-        await apiForm("delete", "/users/0.1/self/jobs", { jobs: ids }, {}, account);
+        await apiForm("delete", "/users/0.1/self/jobs", { jobs: ids }, {}, { account });
         return {
           content: [{ type: "text", text: `✅ Removed ${ids.length} skill(s): IDs ${ids.join(", ")}.` }],
           structuredContent: { removed: ids },
@@ -251,7 +252,7 @@ Use when: "Set my skills to exactly Python, n8n and React", "Replace all my skil
       try {
         assertWriteAllowed(account);
         const ids = await resolveSkillIds(skills);
-        await apiForm("put", "/users/0.1/self/jobs", { jobs: ids }, {}, account);
+        await apiForm("put", "/users/0.1/self/jobs", { jobs: ids }, {}, { account });
         return {
           content: [{ type: "text", text: `✅ Skill list replaced — now ${ids.length} skill(s): IDs ${ids.join(", ")}.` }],
           structuredContent: { skills: ids },

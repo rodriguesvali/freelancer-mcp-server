@@ -1,6 +1,8 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { apiGet, apiPost, formatDate, mcpError, truncate, resolveThreadId, ACCOUNT_DESC } from "../services/api.js";
+import { apiGet, apiPost } from "../services/api.js";
+import { formatDate, mcpError, truncate, ACCOUNT_DESC } from "../services/format.js";
+import { resolveThreadId } from "../services/thread.js";
 import { FreelancerThread, FreelancerMessage } from "../types.js";
 import { CHARACTER_LIMIT, DEFAULT_LIMIT, MAX_LIMIT } from "../constants.js";
 
@@ -37,7 +39,7 @@ Use when: "Show my inbox", "List my message threads", "Who has messaged me?"`,
         const result = await apiGet<{ threads: FreelancerThread[]; total_count: number }>(
           "/messages/0.1/threads",
           params,
-          account
+          { account }
         );
 
         if (!result.threads?.length) {
@@ -94,7 +96,7 @@ Use when: "Show messages in thread 12345", "What did the client say?", "Read the
             limit,
             offset,
           },
-          account
+          { account }
         );
 
         if (!result.messages?.length) {
