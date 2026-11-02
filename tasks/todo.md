@@ -1,6 +1,6 @@
 # Tarefas — correções e melhorias
 
-T01 a T08 foram implementadas; T09 está em andamento. T10 a T13 têm implementação e testes locais, com validações externas e dependências pendentes. P0 = urgente; P1 = robustez; P2 = coesão. Plano e decisões: [plan.md](plan.md).
+T01 a T08 e T14 foram implementadas; T09 está em andamento. T10 a T13 e T15 têm implementação e testes locais, com validações externas e dependências pendentes. P0 = urgente; P1 = robustez; P2 = coesão. Plano e decisões: [plan.md](plan.md).
 
 ## T01 [P0]: Criar base mínima de testes
 
@@ -270,7 +270,7 @@ Implementação e testes locais concluídos; fechamento depende da confirmação
 
 ## T14 [P1]: Tornar desenvolvimento reproduzível
 
-- [ ] **Concluir T14**
+- [x] **Concluir T14**
 
 Corrigir o comando dev sem depender de ts-node global; preferir build + node ou ferramenta explicitamente declarada e compatível.
 
@@ -279,9 +279,9 @@ Corrigir o comando dev sem depender de ts-node global; preferir build + node ou 
 **Arquivos prováveis:** `package.json`, `README.md`, `tests/dev-command.test.ts`.
 
 **Critérios de aceite:**
-- [ ] npm run dev funciona após instalação limpa com versão Node suportada e sem executáveis globais.
-- [ ] Sem credenciais, exibe erro esperado de configuração, em vez de falha de loader/comando ausente.
-- [ ] README explica como fornecer variáveis; não prometer leitura automática de .env sem implementá-la.
+- [x] npm run dev funciona após instalação limpa com versão Node suportada e sem executáveis globais.
+- [x] Sem credenciais, exibe erro esperado de configuração, em vez de falha de loader/comando ausente.
+- [x] README explica como fornecer variáveis; não prometer leitura automática de .env sem implementá-la.
 
 **Verificação:** Instalação limpa sem scripts, inspeção dos scripts necessários e smoke do comando com HTTP simulado; npm run build.
 
@@ -296,8 +296,8 @@ Adicionar CI e checklist de release, preservando lockfile e evitando depender de
 **Arquivos prováveis:** `.github/workflows/ci.yml`, `package.json`, `README.md`, `PUBLISHING.md`.
 
 **Critérios de aceite:**
-- [ ] CI executa instalação congelada com scripts controlados, build, testes, smoke MCP e auditoria; avisos altos/críticos exigem triagem explícita.
-- [ ] Definir e testar a matriz Node realmente suportada; alinhar engines e documentação ao resultado, com impacto de versão registrado.
+- [x] CI executa instalação congelada com scripts controlados, build, testes, smoke MCP e auditoria; avisos altos/críticos exigem triagem explícita.
+- [x] Definir e testar a matriz Node realmente suportada; alinhar engines e documentação ao resultado, com impacto de versão registrado.
 - [ ] Revisão final confirma todos os critérios, orientações de migração e ausência de tokens nos fixtures; sincronizar versões de release se houver publicação futura.
 
 **Verificação:** Executar comandos da CI localmente e validar workflow; revisão humana do diff antes de merge. Publicação fica fora deste plano.
@@ -307,3 +307,5 @@ Adicionar CI e checklist de release, preservando lockfile e evitando depender de
 - [ ] Critérios das tarefas aplicáveis cumpridos, suíte e build passando.
 - [ ] Smoke MCP com HTTP simulado sem regressões; evidências registradas no PR.
 - [ ] Alterações de comportamento documentadas; revisão humana prevista antes de merge.
+
+Implementado workflow para Node 22 e 24 com ações fixadas por commit. Comandos de instalação e teste passaram localmente em Node 22.23.4 e 24.22.2; auditoria sem vulnerabilidades. A execução do workflow no GitHub e a revisão final dependem da publicação da branch e da conclusão da T09.

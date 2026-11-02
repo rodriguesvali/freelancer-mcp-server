@@ -2,6 +2,13 @@
 
 `server.json` and `package.json`'s `mcpName` are already staged for the [MCP Registry](https://registry.modelcontextprotocol.io/). Everything below needs your own credentials (npm login, GitHub device-flow), so it can't be automated — run these yourself from the repo root.
 
+## Before publishing
+
+- Confirm CI passes for Node.js 22 and 24, including the lockfile audit. Triage any high or critical advisories before release.
+- Finish the outstanding response-contract checks and have the changes reviewed.
+- Document the new Node.js 22 minimum and the multi-account write requirement as compatibility changes. Choose the release version accordingly.
+- Check the package and registry versions listed below are consistent.
+
 ## 1. Publish to npm
 
 ```bash
