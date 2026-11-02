@@ -3,7 +3,7 @@ import { z } from "zod";
 import { apiGet, apiPost } from "../services/api.js";
 import { formatDate, mcpError, truncate, ACCOUNT_DESC } from "../services/format.js";
 import { resolveThreadId } from "../services/thread.js";
-import { FreelancerThread, FreelancerMessage } from "../types.js";
+import { FreelancerThread, FreelancerMessage, FreelancerSentMessage } from "../types.js";
 import { CHARACTER_LIMIT, DEFAULT_LIMIT, MAX_LIMIT } from "../constants.js";
 
 export function registerMessageTools(server: McpServer): void {
@@ -36,7 +36,7 @@ Use when: "Show my inbox", "List my message threads", "Who has messaged me?"`,
         const params: Record<string, unknown> = { limit, offset };
         if (context_type) params["context_types[]"] = context_type;
 
-        const result = await apiGet<{ threads: FreelancerThread[]; total_count: number }>(
+        const result = await apiGet<{ threads: FreelancerThread[]; total_count?: number }>(
           "/messages/0.1/threads",
           params,
           { account }
@@ -47,7 +47,7 @@ Use when: "Show my inbox", "List my message threads", "Who has messaged me?"`,
         }
 
         const lines = [
-          `**Your inbox** — ${result.total_count} threads (showing ${result.threads.length}):`,
+          `**Your inbox** — ${result.total_count ?? "unknown"} threads (showing ${result.threads.length}):`,
           "",
           ...result.threads.map((t, i) => formatThread(t, i + 1)),
         ];
@@ -89,7 +89,7 @@ Use when: "Show messages in thread 12345", "What did the client say?", "Read the
     async ({ thread_id: thread_id_input, limit, offset, account }) => {
       try {
         const thread_id = resolveThreadId(thread_id_input);
-        const result = await apiGet<{ messages: FreelancerMessage[]; total_count: number }>(
+        const result = await apiGet<{ messages: FreelancerMessage[]; total_count?: number; unfiltered_count?: number }>(
           "/messages/0.1/messages",
           {
             "threads[]": thread_id,
@@ -104,14 +104,14 @@ Use when: "Show messages in thread 12345", "What did the client say?", "Read the
         }
 
         const lines = [
-          `**Thread ${thread_id}** — ${result.total_count} messages (showing ${result.messages.length}):`,
+          `**Thread ${thread_id}** — ${result.total_count ?? "unknown"} messages (showing ${result.messages.length}):`,
           "",
           ...result.messages.map((m) => formatMessage(m)),
         ];
 
         return {
           content: [{ type: "text", text: truncate(lines.join("\n"), CHARACTER_LIMIT) }],
-          structuredContent: { total: result.total_count, messages: result.messages },
+          structuredContent: { total: result.total_count ?? null, unfiltered_count: result.unfiltered_count, messages: result.messages },
         };
       } catch (err) {
         return mcpError((err as Error).message);
@@ -146,7 +146,7 @@ Use when: "Reply to thread 12345 saying...", "Message the client", "Send a follo
     async ({ thread_id: thread_id_input, message, account }) => {
       try {
         const thread_id = resolveThreadId(thread_id_input);
-        const result = await apiPost<FreelancerMessage>(
+        const result = await apiPost<FreelancerSentMessage>(
           `/messages/0.1/threads/${thread_id}/messages`,
           { message },
           { form: true, account }
@@ -180,7 +180,7 @@ function formatThread(t: FreelancerThread, index: number): string {
     : t.thread?.thread_type ?? "chat";
   const members = t.thread?.members ?? [];
   return [
-    `**${index}. Thread #${t.id}** (${ctxLabel})`,
+    `**${index}. Thread #${t.id ?? t.thread?.id ?? "unknown"}** (${ctxLabel})`,
     `   Members: ${members.length ? members.join(", ") : "unknown"} | Messages: ${t.message_count ?? "?"}`,
     `   Updated: ${formatDate(t.time_updated)}`,
     "",
@@ -193,7 +193,7 @@ function formatMessage(m: FreelancerMessage): string {
       ? `\n   📎 Attachments: ${m.attachments.map((a) => a.filename).join(", ")}`
       : "";
   return [
-    `[${formatDate(m.time_created)}] **User ${m.from_user}:**`,
+    `[${formatDate(m.time_created)}] **User ${m.from_user ?? m.from_user_id ?? "unknown"}:**`,
     m.message,
     attachmentNote,
     "",

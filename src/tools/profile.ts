@@ -111,7 +111,7 @@ function formatUserProfile(user: FreelancerUser): string {
   const rep = user.reputation?.entire_history;
   const loc = user.location;
   return [
-    `**${user.display_name}** (@${user.username})`,
+    `**${user.display_name ?? "Unknown"}** (@${user.username ?? "unknown"})`,
     user.tagline ? `_${user.tagline}_` : "",
     "",
     `📍 ${loc?.city || ""}${loc?.city && loc?.country?.name ? ", " : ""}${loc?.country?.name || "Unknown"}`,

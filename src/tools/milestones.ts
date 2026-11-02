@@ -58,7 +58,7 @@ Use when: "What are the milestones on project 12345?", "Has the milestone been r
 
 function formatMilestone(m: FreelancerMilestone, index: number): string {
   return [
-    `**${index}. Milestone #${m.id}** — $${m.amount} ${m.currency?.code ?? ""}`,
+    `**${index}. Milestone #${m.id ?? m.transaction_id ?? "unknown"}** — $${m.amount ?? "?"} ${m.currency?.code ?? ""}`,
     `   Status: ${m.status}`,
     `   Description: ${m.description || "N/A"}`,
     `   Created: ${formatDate(m.time_created)} | Updated: ${formatDate(m.time_updated)}`,

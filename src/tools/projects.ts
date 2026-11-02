@@ -51,7 +51,7 @@ Use when: "Find projects for Zoho CRM", "Show me hourly WordPress jobs", "Any SE
         if (min_budget !== undefined) params["min_price"] = min_budget;
         if (max_budget !== undefined) params["max_price"] = max_budget;
 
-        const result = await apiGet<{ projects: FreelancerProject[]; total_count: number }>(
+        const result = await apiGet<{ projects: FreelancerProject[]; total_count?: number }>(
           "/projects/0.1/projects/active",
           params,
           { account }
@@ -62,7 +62,7 @@ Use when: "Find projects for Zoho CRM", "Show me hourly WordPress jobs", "Any SE
         }
 
         const lines = [
-          `**Found ${result.total_count} projects** (showing ${result.projects.length}):`,
+          `**Found ${result.total_count ?? "unknown"} projects** (showing ${result.projects.length}):`,
           "",
           ...result.projects.map((p, i) => formatProjectSummary(p, i + 1)),
         ];
@@ -99,7 +99,7 @@ Use when: "Tell me more about project 12345678", "Get the details for this proje
     },
     async ({ project_id, account }) => {
       try {
-        const result = await apiGet<{ projects: Record<string, FreelancerProject> }>(
+        const result = await apiGet<{ projects: Record<string, FreelancerProject> | FreelancerProject[] }>(
           "/projects/0.1/projects",
           {
             "ids[]": project_id,
@@ -163,7 +163,7 @@ Use when: "Show my active projects", "List projects I'm working on", "What proje
         }
         if (status) params["statuses[]"] = status;
 
-        const result = await apiGet<{ projects: FreelancerProject[]; total_count: number }>(
+        const result = await apiGet<{ projects: FreelancerProject[]; total_count?: number }>(
           "/projects/0.1/projects",
           params,
           { account }
@@ -174,7 +174,7 @@ Use when: "Show my active projects", "List projects I'm working on", "What proje
         }
 
         const lines = [
-          `**Your projects as ${role}** — ${result.total_count} total (showing ${result.projects.length}):`,
+          `**Your projects as ${role}** — ${result.total_count ?? "unknown"} total (showing ${result.projects.length}):`,
           "",
           ...result.projects.map((p, i) => formatProjectSummary(p, i + 1)),
         ];
@@ -197,7 +197,7 @@ function formatProjectSummary(p: FreelancerProject, index: number): string {
   const skills = p.jobs?.map((j) => j.name).join(", ") || "";
   return [
     `**${index}. [${p.id}] ${p.title}**`,
-    `   Status: ${p.status} | Type: ${p.type} | Budget: ${budget}`,
+    `   Status: ${p.status ?? "unknown"} | Type: ${p.type ?? "unknown"} | Budget: ${budget}`,
     `   Bids: ${p.bid_stats?.bid_count ?? 0} (avg $${p.bid_stats?.bid_avg?.toFixed(0) ?? "?"})`,
     skills ? `   Skills: ${skills}` : "",
     `   Posted: ${formatDate(p.time_submitted)}`,
@@ -215,7 +215,7 @@ function formatProjectFull(p: FreelancerProject): string {
   return [
     `## [${p.id}] ${p.title}`,
     "",
-    `**Status:** ${p.status} | **Type:** ${p.type} | **Budget:** ${budget}`,
+    `**Status:** ${p.status ?? "unknown"} | **Type:** ${p.type ?? "unknown"} | **Budget:** ${budget}`,
     `**Posted:** ${formatDate(p.time_submitted)} | **Updated:** ${formatDate(p.time_updated)}`,
     `**Bids:** ${p.bid_stats?.bid_count ?? 0} (avg $${p.bid_stats?.bid_avg?.toFixed(0) ?? "?"})`,
     `**Skills:** ${skills}`,

@@ -176,7 +176,7 @@ Adicionar schemas por endpoint e vincular a seleção de schema ao transporte ce
 - [ ] Smoke MCP com HTTP simulado sem regressões; evidências registradas no PR.
 - [ ] Alterações de comportamento documentadas; revisão humana prevista antes de merge.
 
-Progresso: schemas por operação, projeção de campos e testes com fixtures sintéticas implementados. Pendente: confrontar formatos com documentação ou fixtures reais sanitizadas e derivar tipos dos schemas; os tipos genéricos atuais não provam a correspondência com o schema.
+Progresso: schemas por operação, projeção de campos e testes MCP com exemplos sintéticos adaptados dos testes do SDK oficial (freelancer/freelancer-sdk-python, commit 17b8969d7480f3b9ea38d32e499e6c9bb3dd28b8). Tipos de entidades derivam dos schemas. Variantes do SDK para mensagens, threads, projetos, milestones e propostas foram adicionadas. Pendente: confirmar formatos em documentação atual ou respostas reais sanitizadas; revisar os endpoints não cobertos pelo SDK e associar os tipos de retorno dos helpers ao schema selecionado, pois os genéricos ainda permitem divergência.
 
 ## T10 [P1]: Limitar a resposta MCP completa
 

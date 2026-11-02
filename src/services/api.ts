@@ -70,7 +70,10 @@ function unwrap<T>(data: unknown, method: string, path: string, params?: Record<
     throw new Error("Invalid Freelancer API response.");
   }
   if (data.status !== "success") throw new Error("Freelancer API returned an error.");
-  if (!("result" in data) || data.result === undefined) throw new Error("Invalid Freelancer API response.");
+  if (!("result" in data) || data.result === undefined) {
+    if (path === "/users/0.1/self/jobs" && ["post", "put", "delete"].includes(method)) return null as T;
+    throw new Error(method === "get" ? "Invalid Freelancer API response." : "Invalid Freelancer API response after a write; the operation may have completed. Check its status before retrying.");
+  }
   const schema = resultSchema(method, path, params);
   if (!schema) throw new Error("Unsupported Freelancer API response.");
   const result = schema.safeParse(data.result);

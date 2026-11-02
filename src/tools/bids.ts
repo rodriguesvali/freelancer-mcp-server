@@ -32,7 +32,7 @@ Use when: "Who has bid on project 12345?", "How much are people bidding?", "Show
     },
     async ({ project_id, limit, offset, account }) => {
       try {
-        const result = await apiGet<{ bids: FreelancerBid[]; total_count: number }>(
+        const result = await apiGet<{ bids: FreelancerBid[]; total_count?: number }>(
           "/projects/0.1/bids",
           {
             "project_ids[]": project_id,
@@ -49,7 +49,7 @@ Use when: "Who has bid on project 12345?", "How much are people bidding?", "Show
         }
 
         const lines = [
-          `**Bids on project ${project_id}** — ${result.total_count} total (showing ${result.bids.length}):`,
+          `**Bids on project ${project_id}** — ${result.total_count ?? "unknown"} total (showing ${result.bids.length}):`,
           "",
           ...result.bids.map((b, i) => formatBid(b, i + 1)),
         ];
@@ -101,7 +101,7 @@ Use when: "Show my bids", "Which of my bids are active?", "Have any of my bids b
         };
         if (status) params["statuses[]"] = status;
 
-        const result = await apiGet<{ bids: FreelancerBid[]; total_count: number }>(
+        const result = await apiGet<{ bids: FreelancerBid[]; total_count?: number }>(
           "/projects/0.1/bids",
           params,
           { account }
@@ -112,7 +112,7 @@ Use when: "Show my bids", "Which of my bids are active?", "Have any of my bids b
         }
 
         const lines = [
-          `**Your bids** — ${result.total_count} total (showing ${result.bids.length}):`,
+          `**Your bids** — ${result.total_count ?? "unknown"} total (showing ${result.bids.length}):`,
           "",
           ...result.bids.map((b, i) => formatBid(b, i + 1)),
         ];
@@ -176,7 +176,7 @@ Use when: "Bid $150 on project 12345 with 7 days delivery", "Submit a proposal"`
                 `Bid ID: ${result.id}`,
                 `Project: ${project_id}`,
                 `Amount: $${amount} | Delivery: ${period} days`,
-                `Status: ${result.status}`,
+                `Status: ${result.status ?? "unknown"}`,
                 `Submitted: ${formatDate(result.time_submitted)}`,
               ].join("\n"),
             },
@@ -193,9 +193,9 @@ Use when: "Bid $150 on project 12345 with 7 days delivery", "Submit a proposal"`
 function formatBid(b: FreelancerBid, index: number): string {
   const bidder = b.bidder;
   return [
-    `**${index}. Bid #${b.id}** — $${b.amount} / ${b.period} days`,
-    `   Status: ${b.status} | Submitted: ${formatDate(b.time_submitted)}`,
-    bidder ? `   Bidder: @${bidder.username} (${bidder.display_name}) ⭐ ${b.reputation?.overall?.toFixed(2) ?? "N/A"}` : "",
+    `**${index}. Bid #${b.id}** — $${b.amount ?? "?"} / ${b.period ?? "?"} days`,
+    `   Status: ${b.status ?? "unknown"} | Submitted: ${formatDate(b.time_submitted)}`,
+    bidder ? `   Bidder: @${bidder.username ?? "unknown"} (${bidder.display_name ?? "Unknown"}) ⭐ ${b.reputation?.overall?.toFixed(2) ?? "N/A"}` : "",
     b.description ? `   Proposal: ${b.description.slice(0, 200)}${b.description.length > 200 ? "..." : ""}` : "",
     "",
   ]
