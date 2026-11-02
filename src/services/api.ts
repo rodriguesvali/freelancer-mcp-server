@@ -86,96 +86,64 @@ function toApiError(error: unknown): Error {
   return error instanceof Error ? error : new Error("Freelancer API request failed.");
 }
 
-export async function apiGet<T>(
-  path: string,
-  params?: Record<string, unknown>,
-  account?: string
-): Promise<T> {
-  const client = getApiClient(account);
+type RequestOptions = {
+  method: "get" | "post" | "put" | "delete";
+  path: string;
+  account?: string;
+  params?: Record<string, unknown>;
+  data?: Record<string, unknown>;
+  form?: boolean;
+  formExtra?: Record<string, unknown>;
+};
+
+function serializeForm(...fields: Record<string, unknown>[]): string {
+  const body = new URLSearchParams();
+  for (const [key, value] of fields.flatMap(Object.entries)) {
+    if (value === undefined || value === null) continue;
+    if (Array.isArray(value)) {
+      for (const item of value) body.append(`${key}[]`, String(item));
+    } else body.append(key, String(value));
+  }
+  return body.toString();
+}
+
+async function request<T>({ method, path, account, params, data, form, formExtra }: RequestOptions): Promise<T> {
+  const client = getApiClient(account, method !== "get");
   try {
-    const response = await client.get<unknown>(path, { params });
-    return unwrap(response.data, "get", path, params);
+    const response = await client.request<unknown>({
+      method,
+      url: path,
+      params,
+      data: form && data ? serializeForm(data, formExtra ?? {}) : data,
+      ...(form && data ? { headers: { "Content-Type": "application/x-www-form-urlencoded" } } : {}),
+    });
+    return unwrap(response.data, method, path, params);
   } catch (error) {
     throw toApiError(error);
   }
 }
 
-export async function apiPost<T>(
-  path: string,
-  data?: Record<string, unknown>,
-  opts?: { form?: boolean; account?: string }
-): Promise<T> {
-  const client = getApiClient(opts?.account, true);
-  try {
-    // The Freelancer API expects application/x-www-form-urlencoded for most
-    // write endpoints; JSON bodies are silently ignored or rejected.
-    let body: unknown = data;
-    let config;
-    if (opts?.form && data) {
-      const params = new URLSearchParams();
-      for (const [key, value] of Object.entries(data)) {
-        if (value === undefined || value === null) continue;
-        if (Array.isArray(value)) {
-          for (const v of value) params.append(`${key}[]`, String(v));
-        } else {
-          params.append(key, String(value));
-        }
-      }
-      body = params.toString();
-      config = { headers: { "Content-Type": "application/x-www-form-urlencoded" } };
-    }
-    const response = await client.post<unknown>(path, body, config);
-    return unwrap(response.data, "post", path);
-  } catch (error) {
-    throw toApiError(error);
-  }
+export function apiGet<T>(path: string, params?: Record<string, unknown>, account?: string): Promise<T> {
+  return request<T>({ method: "get", path, params, account });
 }
 
-export async function apiPut<T>(
-  path: string,
-  data?: Record<string, unknown>,
-  account?: string
-): Promise<T> {
-  const client = getApiClient(account, true);
-  try {
-    const response = await client.put<unknown>(path, data);
-    return unwrap(response.data, "put", path);
-  } catch (error) {
-    throw toApiError(error);
-  }
+export function apiPost<T>(path: string, data?: Record<string, unknown>, opts?: { form?: boolean; account?: string }): Promise<T> {
+  return request<T>({ method: "post", path, data, ...opts });
 }
 
-/**
- * Some Freelancer write endpoints (notably /users/0.1/self/jobs) reject JSON and
- * require application/x-www-form-urlencoded with repeated array keys (jobs[]=1&jobs[]=2).
- * `arrayParams` maps a field name to a list of values serialized that way.
- */
-export async function apiForm<T>(
+export function apiPut<T>(path: string, data?: Record<string, unknown>, account?: string): Promise<T> {
+  return request<T>({ method: "put", path, data, account });
+}
+
+/** Serialize array fields as repeated keys (jobs[]=1&jobs[]=2). */
+export function apiForm<T>(
   method: "post" | "put" | "delete",
   path: string,
   arrayParams: Record<string, Array<string | number>> = {},
   scalarParams: Record<string, string | number> = {},
   account?: string
 ): Promise<T> {
-  const client = getApiClient(account, true);
-  const body = new URLSearchParams();
-  for (const [key, values] of Object.entries(arrayParams)) {
-    for (const v of values) body.append(`${key}[]`, String(v));
-  }
-  for (const [key, value] of Object.entries(scalarParams)) {
-    body.append(key, String(value));
-  }
-  try {
-    const response = await client.request<unknown>({
-      method,
-      url: path,
-      data: body.toString(),
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    });
-    return unwrap(response.data, method, path);
-  } catch (error) {
-    throw toApiError(error);
-  }
+  return request<T>({ method, path, data: arrayParams, formExtra: scalarParams, form: true, account });
 }
 
 export function truncate(text: string, limit: number): string {
