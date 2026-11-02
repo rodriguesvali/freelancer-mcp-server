@@ -170,7 +170,7 @@ The Freelancer.com public REST API is read-mostly for profiles. After probing th
 
 ## Response size
 
-Tool results are limited to 32,768 UTF-8 bytes after JSON serialization, including text and structured content. When a result exceeds this limit, structured content is omitted and the text may be shortened. The result identifies omitted fields and the number of omitted array items. For tools with pagination, repeat the request with a smaller `limit` and the same `offset` to retrieve the omitted data. Other results may require a more targeted query.
+Tool results are limited to 32,768 UTF-8 bytes after JSON serialization, including text and structured content. When a result exceeds this limit, structured content is omitted and the text may be shortened. The result identifies omitted fields and the number of omitted array items. For supported paginated tools, the result includes suggested `retry.limit` and `retry.offset` values when the page size can be reduced; repeat the request with those values and the same remaining arguments. If a single item exceeds the limit, use a more targeted query where possible. Other results may also require a more targeted query.
 
 For specialty profile updates, omit `skills` to leave skills unchanged. An empty list is rejected because clearing all skills is not confirmed by the API contract.
 

@@ -195,7 +195,7 @@ Aplicar orçamento ao resultado completo, incluindo structuredContent, por um po
 
 **Verificação:** Testes com mensagens longas, Unicode e coleções grandes; smoke MCP; npm test; npm run build.
 
-Implementado limite de 32768 bytes e testes MCP locais. Conclusão depende da validação externa dos contratos da T09.
+Implementado limite de 32768 bytes, sugestões concretas de repetição para páginas e testes MCP com ferramenta real simulada, Unicode, chamadas concorrentes e item único. A implementação local está validada; o fechamento formal depende da validação externa dos contratos da T09.
 
 ## T11 [P1]: Definir semântica de skills vazias
 
