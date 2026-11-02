@@ -255,12 +255,12 @@ Separar skills de specialty profiles, mantendo registerAccountTools como fachada
 **Critérios de aceite:**
 - [x] Ferramentas mantêm nomes, schemas públicos e resultados já corrigidos; snapshot de tools/list permanece equivalente.
 - [x] Transporte não contém formatação nem parsing de links; catálogo e resolução de skills têm um único proprietário.
-- [ ] Padronizar opções internas de account, formato e método no transporte, adaptando chamadores em lotes pequenos; remover fachada apenas após eliminar consumidores.
+- [x] Padronizar opções internas de account, formato e método no transporte, adaptando chamadores em lotes pequenos; remover fachada apenas após eliminar consumidores.
 
 **Verificação:** Testes de caracterização e smoke MCP após cada extração; npm test; npm run build.
 
 
-Implementação e testes locais concluídos; fechamento depende da confirmação dos contratos de resposta da T09 e das pendências de T10/T11. A fachada de registro de contas permanece como ponto de composição usado pelo servidor e pelos testes.
+A fachada de contas foi removida após migrar o servidor e os testes para os dois módulos; o snapshot das ferramentas permanece equivalente. Todos os critérios locais foram verificados, mas o fechamento formal depende de T10, T11 e T12.
 
 ### Checkpoint E — coesão
 

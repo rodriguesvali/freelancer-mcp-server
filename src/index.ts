@@ -8,7 +8,8 @@ import { registerProjectTools } from "./tools/projects.js";
 import { registerBidTools } from "./tools/bids.js";
 import { registerMilestoneTools } from "./tools/milestones.js";
 import { registerMessageTools } from "./tools/messages.js";
-import { registerAccountTools } from "./tools/account.js";
+import { registerSkillTools } from "./tools/skills.js";
+import { registerSpecialtyProfileTools } from "./tools/specialty-profiles.js";
 import { registerMetaTools } from "./tools/meta.js";
 
 /**
@@ -77,7 +78,8 @@ registerProjectTools(server);
 registerBidTools(server);
 registerMilestoneTools(server);
 registerMessageTools(server);
-registerAccountTools(server);
+registerSkillTools(server);
+registerSpecialtyProfileTools(server);
 
 async function main(): Promise<void> {
   const transport = new BoundedToolTransport(new StdioServerTransport());

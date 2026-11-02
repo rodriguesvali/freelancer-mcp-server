@@ -4,10 +4,11 @@ import {test} from 'node:test';
 import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import {Client} from '@modelcontextprotocol/sdk/client/index.js';
 import {InMemoryTransport} from '@modelcontextprotocol/sdk/inMemory.js';
-import {registerAccountTools} from '../dist/tools/account.js';
+import {registerSkillTools} from '../dist/tools/skills.js';
+import {registerSpecialtyProfileTools} from '../dist/tools/specialty-profiles.js';
 
 test('account tool definitions remain unchanged',async t => {
-  const server=new McpServer({name:'test',version:'1'}); registerAccountTools(server);
+  const server=new McpServer({name:'test',version:'1'}); registerSkillTools(server); registerSpecialtyProfileTools(server);
   const client=new Client({name:'test',version:'1'}); const [ct,st]=InMemoryTransport.createLinkedPair();
   t.after(async()=>{await client.close();await server.close();});
   await server.connect(st); await client.connect(ct);
